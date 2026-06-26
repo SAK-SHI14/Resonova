@@ -1,7 +1,7 @@
 """
-Unit tests for babel.asr.transcribe
+Unit tests for mimi.asr.transcribe
 ====================================
-Run with:  pytest babel/asr/tests/test_transcribe.py -v
+Run with:  pytest mimi/asr/tests/test_transcribe.py -v
 
 These are smoke tests:
   - Verify transcribe() runs without crashing on known-good input
@@ -26,7 +26,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from babel.exceptions import TranscriptionError
+from mimi.exceptions import TranscriptionError
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -82,8 +82,8 @@ class TestTranscribe:
 
     def test_returns_non_empty_string(self, silent_wav: Path, mock_whisper_model):
         """transcribe() must return a non-empty string on valid audio."""
-        with patch("babel.asr.transcribe._load_model", return_value=mock_whisper_model):
-            from babel.asr.transcribe import transcribe
+        with patch("mimi.asr.transcribe._load_model", return_value=mock_whisper_model):
+            from mimi.asr.transcribe import transcribe
             result = transcribe(str(silent_wav))
 
         assert isinstance(result, str), "Return type must be str"
@@ -91,7 +91,7 @@ class TestTranscribe:
 
     def test_file_not_found_raises_correct_exception(self):
         """transcribe() must raise FileNotFoundError — not bare Exception — for missing files."""
-        from babel.asr.transcribe import transcribe
+        from mimi.asr.transcribe import transcribe
         with pytest.raises(FileNotFoundError):
             transcribe("/nonexistent/path/audio.wav")
 
@@ -100,8 +100,8 @@ class TestTranscribe:
         mock_model = MagicMock()
         mock_model.transcribe.return_value = {"text": "   ", "segments": []}
 
-        with patch("babel.asr.transcribe._load_model", return_value=mock_model):
-            from babel.asr.transcribe import transcribe
+        with patch("mimi.asr.transcribe._load_model", return_value=mock_model):
+            from mimi.asr.transcribe import transcribe
             with pytest.raises(TranscriptionError, match="empty transcript"):
                 transcribe(str(silent_wav))
 
@@ -110,14 +110,14 @@ class TestTranscribe:
         mock_model = MagicMock()
         mock_model.transcribe.side_effect = RuntimeError("CUDA out of memory")
 
-        with patch("babel.asr.transcribe._load_model", return_value=mock_model):
-            from babel.asr.transcribe import transcribe
+        with patch("mimi.asr.transcribe._load_model", return_value=mock_model):
+            from mimi.asr.transcribe import transcribe
             with pytest.raises(TranscriptionError, match="failed"):
                 transcribe(str(silent_wav))
 
     def test_directory_path_raises_transcription_error(self, tmp_path: Path):
         """transcribe() must raise TranscriptionError when given a directory path."""
-        from babel.asr.transcribe import transcribe
+        from mimi.asr.transcribe import transcribe
         with pytest.raises(TranscriptionError, match="directory"):
             transcribe(str(tmp_path))
 
@@ -126,16 +126,16 @@ class TestTranscribe:
         mock_model = MagicMock()
         mock_model.transcribe.return_value = {"text": "  hello world  ", "segments": []}
 
-        with patch("babel.asr.transcribe._load_model", return_value=mock_model):
-            from babel.asr.transcribe import transcribe
+        with patch("mimi.asr.transcribe._load_model", return_value=mock_model):
+            from mimi.asr.transcribe import transcribe
             result = transcribe(str(silent_wav))
 
         assert result == "hello world", f"Expected stripped result, got: '{result}'"
 
     def test_model_size_param_passed_to_load_model(self, silent_wav: Path, mock_whisper_model):
         """transcribe() must pass the model_size argument to _load_model."""
-        with patch("babel.asr.transcribe._load_model", return_value=mock_whisper_model) as mock_load:
-            from babel.asr.transcribe import transcribe
+        with patch("mimi.asr.transcribe._load_model", return_value=mock_whisper_model) as mock_load:
+            from mimi.asr.transcribe import transcribe
             transcribe(str(silent_wav), model_size="large-v3")
 
         mock_load.assert_called_once_with("large-v3")
@@ -149,16 +149,16 @@ class TestTranscribeWithTimestamps:
 
     def test_returns_list(self, silent_wav: Path, mock_whisper_model):
         """transcribe_with_timestamps() must return a list."""
-        with patch("babel.asr.transcribe._load_model", return_value=mock_whisper_model):
-            from babel.asr.transcribe import transcribe_with_timestamps
+        with patch("mimi.asr.transcribe._load_model", return_value=mock_whisper_model):
+            from mimi.asr.transcribe import transcribe_with_timestamps
             result = transcribe_with_timestamps(str(silent_wav))
 
         assert isinstance(result, list), "Return type must be list"
 
     def test_segments_have_required_keys(self, silent_wav: Path, mock_whisper_model):
         """Each segment dict must contain 'start', 'end', and 'text' keys."""
-        with patch("babel.asr.transcribe._load_model", return_value=mock_whisper_model):
-            from babel.asr.transcribe import transcribe_with_timestamps
+        with patch("mimi.asr.transcribe._load_model", return_value=mock_whisper_model):
+            from mimi.asr.transcribe import transcribe_with_timestamps
             segments = transcribe_with_timestamps(str(silent_wav))
 
         for seg in segments:
@@ -168,6 +168,6 @@ class TestTranscribeWithTimestamps:
 
     def test_file_not_found_raises_file_not_found_error(self):
         """transcribe_with_timestamps() must raise FileNotFoundError for missing files."""
-        from babel.asr.transcribe import transcribe_with_timestamps
+        from mimi.asr.transcribe import transcribe_with_timestamps
         with pytest.raises(FileNotFoundError):
             transcribe_with_timestamps("/nonexistent/path/audio.wav")

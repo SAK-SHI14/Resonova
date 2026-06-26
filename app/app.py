@@ -1,5 +1,5 @@
 """
-babel.app.app
+mimi.app.app
 =============
 Gradio application — Phase 0 stub.
 
@@ -24,7 +24,7 @@ import time
 
 import gradio as gr
 
-from babel.logger import get_logger
+from mimi.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -84,7 +84,7 @@ def run_dubbing_pipeline(video_file, target_language: str) -> tuple[str, str]:
     # ── PHASE 0 STUB ──────────────────────────────────────────────────────
     # This is a placeholder. In Phase 4, replace this block with:
     #
-    #   from babel.pipeline import dub_video
+    #   from mimi.pipeline import dub_video
     #   output_path = dub_video(video_file, target_lang="hin_Deva")
     #   return output_path, "✅ Dubbing complete!"
     #
@@ -95,7 +95,7 @@ def run_dubbing_pipeline(video_file, target_language: str) -> tuple[str, str]:
         return None, "❌ No video uploaded. Please upload a video file."
 
     try:
-        from babel.pipeline import dub_video  # noqa: PLC0415
+        from mimi.pipeline import dub_video  # noqa: PLC0415
         
         # Map target dropdown selection to standard internal BCP-47 codes
         lang_map = {
@@ -133,7 +133,7 @@ def _build_interface() -> gr.Blocks:
     """Build and return the Gradio Blocks interface."""
 
     with gr.Blocks(
-        title="Babel — Emotion-Preserving AI Dubbing",
+        title="Mimi — Emotion-Preserving AI Dubbing",
         theme=gr.themes.Soft(
             primary_hue="violet",
             secondary_hue="indigo",
@@ -155,7 +155,7 @@ def _build_interface() -> gr.Blocks:
         # ── Header ────────────────────────────────────────────────────────
         gr.Markdown(
             """
-            # 🗣️ Babel
+            # 🗣️ Mimi
             ### Emotion-Preserving AI Dubbing · English → Hindi · Same Speaker Voice
             """,
         )
@@ -245,8 +245,8 @@ def _build_interface() -> gr.Blocks:
                 └──────────────┘
                 ```
 
-                **What makes Babel different:** Most dubbing tools produce flat, robotic
-                translations. Babel's prosody layer extracts and preserves the original
+                **What makes Mimi different:** Most dubbing tools produce flat, robotic
+                translations. Mimi's prosody layer extracts and preserves the original
                 speaker's emotional tone — if you spoke with excitement, the Hindi
                 output sounds excited too.
                 """
@@ -305,7 +305,7 @@ def create_app() -> gr.Blocks:
 demo = create_app()
 
 if __name__ == "__main__":
-    # Direct execution: python -m babel.app.app
+    # Direct execution: python -m mimi.app.app
     # (Normally you'd use launch.py instead)
     demo.launch(
         server_name=os.environ.get("GRADIO_SERVER_NAME", "0.0.0.0"),

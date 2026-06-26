@@ -1,5 +1,5 @@
 """
-Babel — Core Pipeline Orchestrator
+Mimi — Core Pipeline Orchestrator
 ==================================
 Chains ASR, Translation, Voice Cloning, and Lip-Sync stages into a single pipeline.
 
@@ -22,19 +22,19 @@ from typing import Optional
 import cv2
 import torch
 
-from babel.asr.transcribe import transcribe, unload_model as unload_asr
-from babel.exceptions import (
+from mimi.asr.transcribe import transcribe, unload_model as unload_asr
+from mimi.exceptions import (
     AudioExtractionError,
-    BabelError,
+    MimiError,
     LipSyncError,
     TranscriptionError,
     TranslationError,
     VoiceCloningError,
 )
-from babel.logger import get_logger
-from babel.lipsync.lipsync import lipsync
-from babel.translation.translate import translate, unload_model as unload_translation
-from babel.voice_cloning.clone_voice import clone_voice, unload_model as unload_voice
+from mimi.logger import get_logger
+from mimi.lipsync.lipsync import lipsync
+from mimi.translation.translate import translate, unload_model as unload_translation
+from mimi.voice_cloning.clone_voice import clone_voice, unload_model as unload_voice
 
 logger = get_logger(__name__)
 
@@ -323,7 +323,7 @@ def dub_video(
                 shutil.copy(str(cloned_audio_raw_path), str(cloned_audio_synced_path))
 
         except Exception as exc:
-            raise BabelError(f"Audio synchronization stage failed: {exc}") from exc
+            raise MimiError(f"Audio synchronization stage failed: {exc}") from exc
     timings["Synchronization"] = time.perf_counter() - t0
 
     # --- STAGE 6: Lip-Sync (Wav2Lip) ---

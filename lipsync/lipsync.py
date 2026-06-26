@@ -1,5 +1,5 @@
 """
-Babel — Lip-Sync Module
+Mimi — Lip-Sync Module
 =========================
 Wrapper around Wav2Lip for audio-driven lip synchronization.
 
@@ -40,7 +40,7 @@ Integration Pattern:
   This module calls Wav2Lip via subprocess (its inference.py script)
   because Wav2Lip was not designed as a pip-installable library.
   The subprocess approach avoids import-level dependency conflicts
-  while keeping Babel's own dependency tree clean.
+  while keeping Mimi's own dependency tree clean.
 
 Known Limitations (documented, not hidden):
   - Wav2Lip produces visible artifacts on fast head movement or profile angles.
@@ -52,7 +52,7 @@ Known Limitations (documented, not hidden):
     the non-GAN checkpoint but can introduce occasional texture artifacts.
 
 Usage:
-    from babel.lipsync.lipsync import lipsync
+    from mimi.lipsync.lipsync import lipsync
     output_video = lipsync(
         video_path="samples/source_video.mp4",
         audio_path="outputs/cloned_hindi.wav",
@@ -68,8 +68,8 @@ import time
 from pathlib import Path
 from typing import Optional
 
-from babel.exceptions import LipSyncError
-from babel.logger import get_logger
+from mimi.exceptions import LipSyncError
+from mimi.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -247,7 +247,7 @@ def lipsync(
 
     # --- Build Wav2Lip subprocess command ---
     # We call inference.py as a subprocess to avoid importing Wav2Lip's modules
-    # directly (which would cause dependency conflicts with Babel's own imports).
+    # directly (which would cause dependency conflicts with Mimi's own imports).
     pads_str = " ".join(str(p) for p in pads)
     cmd = [
         sys.executable,            # use the same Python interpreter

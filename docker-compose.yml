@@ -1,5 +1,5 @@
 # ============================================================
-# Babel — Docker Compose
+# Mimi — Docker Compose
 # ============================================================
 # Usage:
 #   docker compose up           # start (builds if image doesn't exist)
@@ -26,12 +26,12 @@
 version: "3.9"
 
 services:
-  babel:
+  mimi:
     build:
       context: .
       dockerfile: Dockerfile
-    image: babel:latest
-    container_name: babel_app
+    image: mimi:latest
+    container_name: mimi_app
 
     # ─── Port mapping ────────────────────────────────────────────────────────
     ports:

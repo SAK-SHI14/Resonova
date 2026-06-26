@@ -1,7 +1,7 @@
 """
-Unit tests for babel.lipsync.lipsync
+Unit tests for mimi.lipsync.lipsync
 =====================================
-Run with:  pytest babel/lipsync/tests/test_lipsync.py -v
+Run with:  pytest mimi/lipsync/tests/test_lipsync.py -v
 
 Smoke tests — these mock the subprocess call because Wav2Lip requires
 a full GPU environment to actually run. The tests verify:
@@ -24,7 +24,7 @@ import os
 
 import pytest
 
-from babel.exceptions import LipSyncError
+from mimi.exceptions import LipSyncError
 
 
 # ---------------------------------------------------------------------------
@@ -86,7 +86,7 @@ class TestLipsync:
 
     def test_raises_file_not_found_for_missing_video(self, cloned_audio: Path, tmp_path: Path, mock_env):
         """lipsync() must raise FileNotFoundError if video file is missing."""
-        from babel.lipsync.lipsync import lipsync
+        from mimi.lipsync.lipsync import lipsync
         with pytest.raises(FileNotFoundError):
             lipsync(
                 video_path="/nonexistent/video.mp4",
@@ -96,7 +96,7 @@ class TestLipsync:
 
     def test_raises_file_not_found_for_missing_audio(self, source_video: Path, tmp_path: Path, mock_env):
         """lipsync() must raise FileNotFoundError if audio file is missing."""
-        from babel.lipsync.lipsync import lipsync
+        from mimi.lipsync.lipsync import lipsync
         with pytest.raises(FileNotFoundError):
             lipsync(
                 video_path=str(source_video),
@@ -111,7 +111,7 @@ class TestLipsync:
         monkeypatch.delenv("WAV2LIP_REPO_PATH", raising=False)
         monkeypatch.delenv("WAV2LIP_CHECKPOINT_PATH", raising=False)
 
-        from babel.lipsync.lipsync import lipsync
+        from mimi.lipsync.lipsync import lipsync
         with pytest.raises(LipSyncError, match="WAV2LIP_REPO_PATH"):
             lipsync(
                 video_path=str(source_video),
@@ -129,7 +129,7 @@ class TestLipsync:
         mock_result.stdout = ""
 
         with patch("subprocess.run", return_value=mock_result):
-            from babel.lipsync.lipsync import lipsync
+            from mimi.lipsync.lipsync import lipsync
             with pytest.raises(LipSyncError, match="exit code 1"):
                 lipsync(
                     video_path=str(source_video),
@@ -147,7 +147,7 @@ class TestLipsync:
         mock_result.stdout = ""
 
         with patch("subprocess.run", return_value=mock_result):
-            from babel.lipsync.lipsync import lipsync
+            from mimi.lipsync.lipsync import lipsync
             with pytest.raises(LipSyncError) as exc_info:
                 lipsync(
                     video_path=str(source_video),
@@ -174,7 +174,7 @@ class TestLipsync:
             return mock_result
 
         with patch("subprocess.run", side_effect=fake_run):
-            from babel.lipsync.lipsync import lipsync
+            from mimi.lipsync.lipsync import lipsync
             result = lipsync(
                 video_path=str(source_video),
                 audio_path=str(cloned_audio),
@@ -189,7 +189,7 @@ class TestLipsync:
     ):
         """lipsync() must raise LipSyncError on subprocess timeout."""
         with patch("subprocess.run", side_effect=subprocess.TimeoutExpired(cmd="test", timeout=600)):
-            from babel.lipsync.lipsync import lipsync
+            from mimi.lipsync.lipsync import lipsync
             with pytest.raises(LipSyncError, match="timed out"):
                 lipsync(
                     video_path=str(source_video),
@@ -213,7 +213,7 @@ class TestLipsync:
             return mock_result
 
         with patch("subprocess.run", side_effect=fake_run):
-            from babel.lipsync.lipsync import lipsync
+            from mimi.lipsync.lipsync import lipsync
             result = lipsync(
                 video_path=str(source_video),
                 audio_path=str(cloned_audio),

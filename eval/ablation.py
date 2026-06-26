@@ -1,5 +1,5 @@
 """
-Babel — Ablation Study Orchestrator
+Mimi — Ablation Study Orchestrator
 ===================================
 Runs the dubbing pipeline with and without prosody/emotion conditioning,
 calculates comparative metrics, and generates a markdown report.
@@ -10,22 +10,22 @@ import time
 from pathlib import Path
 from typing import Dict, Any, Optional
 
-from babel.asr.transcribe import transcribe
-from babel.eval.metrics import (
+from mimi.asr.transcribe import transcribe
+from mimi.eval.metrics import (
     compute_bleu,
     compute_chrf,
     emotion_agreement,
     speaker_similarity,
 )
-from babel.logger import get_logger
-from babel.pipeline import dub_video, extract_audio_from_video
+from mimi.logger import get_logger
+from mimi.pipeline import dub_video, extract_audio_from_video
 
 logger = get_logger(__name__)
 
 
 def generate_report_content(metrics_on: dict, metrics_off: dict, video_name: str) -> str:
     """Format metrics into a unified markdown ablation report."""
-    report = f"""# Project Babel — Evaluation & Ablation Report
+    report = f"""# Project Mimi — Evaluation & Ablation Report
 
 This report presents a comparative evaluation of the AI dubbing pipeline on the clip **`{video_name}`**. 
 We compare the default **Emotion/Prosody Conditioning (ON)** run against a baseline **No-Conditioning (OFF)** run.

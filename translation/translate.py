@@ -1,5 +1,5 @@
 """
-Babel — Translation Module
+Mimi — Translation Module
 ===========================
 Wrapper around AI4Bharat IndicTrans2 for English → Hindi (and other Indic language) translation.
 
@@ -19,7 +19,7 @@ Language Code Format (IndicTrans2 uses BCP-47 + script):
   Full list: https://github.com/AI4Bharat/IndicTrans2#supported-languages
 
 Usage:
-    from babel.translation.translate import translate
+    from mimi.translation.translate import translate
     hindi_text = translate("Hello, how are you?", "eng_Latn", "hin_Deva")
 """
 
@@ -27,8 +27,8 @@ import os
 import time
 from typing import Optional
 
-from babel.exceptions import TranslationError
-from babel.logger import get_logger
+from mimi.exceptions import TranslationError
+from mimi.logger import get_logger
 
 logger = get_logger(__name__)
 

@@ -1,5 +1,5 @@
 """
-Babel — ASR Module
+Mimi — ASR Module
 ==================
 Wrapper around OpenAI Whisper for automatic speech recognition.
 
@@ -11,7 +11,7 @@ GPU Memory (T4 reference):
   - large-v3 : ~3.0 GB VRAM ← higher quality, still fits T4
 
 Usage:
-    from babel.asr.transcribe import transcribe
+    from mimi.asr.transcribe import transcribe
     text = transcribe("path/to/audio.wav")
     text = transcribe("path/to/audio.wav", model_size="large-v3", language="en")
 """
@@ -21,8 +21,8 @@ import time
 from pathlib import Path
 from typing import Optional
 
-from babel.exceptions import TranscriptionError
-from babel.logger import get_logger
+from mimi.exceptions import TranscriptionError
+from mimi.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -88,7 +88,7 @@ def transcribe(
         language:    BCP-47 language code of the source speech (e.g., 'en', 'hi').
                      Pass None to let Whisper auto-detect the language.
         task:        'transcribe' (default) or 'translate' (Whisper's built-in
-                     translation to English — not used in Babel's main pipeline,
+                     translation to English — not used in Mimi's main pipeline,
                      but available for debugging).
 
     Returns:

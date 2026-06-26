@@ -1,8 +1,8 @@
 """
-Babel — Pipeline Evaluation Sub-package.
+Mimi — Pipeline Evaluation Sub-package.
 """
 
-from babel.eval.metrics import (
+from mimi.eval.metrics import (
     speaker_similarity,
     compute_bleu,
     compute_chrf,

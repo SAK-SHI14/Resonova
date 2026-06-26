@@ -2,13 +2,13 @@
 **Status:** Accepted  
 **Date:** Phase 0 — Environment Sprint  
 **Authors:** Sakshi Verma  
-**Context:** Project Babel — emotion-preserving dubbing pipeline (English → Hindi)
+**Context:** Project Mimi — emotion-preserving dubbing pipeline (English → Hindi)
 
 ---
 
 ## Context
 
-Babel is a GPU-heavy inference pipeline. It requires:
+Mimi is a GPU-heavy inference pipeline. It requires:
 - NVIDIA GPU with CUDA support for all model inference (Whisper, IndicTrans2, XTTS-v2, Wav2Lip)
 - Persistent storage for model weights and intermediate outputs
 - A reproducible, publicly demonstrable deployment for portfolio evaluation
@@ -46,7 +46,7 @@ Colab and Kaggle sessions are **temporary**:
 1. All code lives in **GitHub** — pull at session start, push at session end
 2. All intermediate outputs (transcripts, cloned audio, dubbed video, eval results, fine-tuned weights if any) are checkpointed to **Google Drive** immediately after each pipeline stage
 3. Every notebook cell that produces output includes a Drive checkpoint log statement
-4. The session-start template notebook (`notebooks/babel_colab_template.ipynb`) restores the full environment in ~5 minutes
+4. The session-start template notebook (`notebooks/mimi_colab_template.ipynb`) restores the full environment in ~5 minutes
 
 ### GPU Memory Budget (T4 = ~15 GB VRAM)
 
@@ -144,7 +144,7 @@ All code lives in GitHub. Neither Colab, Kaggle, nor the Docker container is the
 
 ```
 Session start: git pull (Colab/Kaggle)
-Work in session: code changes in /content/babel
+Work in session: code changes in /content/mimi
 Session end: git push (code) + Drive checkpoint (outputs)
 ```
 

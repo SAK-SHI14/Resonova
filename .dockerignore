@@ -1,5 +1,5 @@
 # ============================================================
-# Babel — .dockerignore
+# Mimi — .dockerignore
 # ============================================================
 # Keeps the Docker build context small by excluding files that
 # are not needed inside the container.

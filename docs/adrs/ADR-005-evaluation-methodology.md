@@ -3,13 +3,13 @@
 **Status:** Accepted  
 **Date:** Week 3, Phase 3  
 **Authors:** Sakshi Verma  
-**Context:** Project Babel — evaluation suite
+**Context:** Project Mimi — evaluation suite
 
 ---
 
 ## Context
 
-Babel needs a quantitative evaluation suite to measure the pipeline's performance across multiple dimensions:
+Mimi needs a quantitative evaluation suite to measure the pipeline's performance across multiple dimensions:
 1. **Translation Accuracy**: Does the Hindi output represent the same meaning?
 2. **Speaker Similarity**: Does the cloned voice sound like the original speaker?
 3. **Emotion/Prosody Preservation**: Is the emotional cadence (pace, pitch inflections, intensity) preserved?

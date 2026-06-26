@@ -1,5 +1,5 @@
 """
-Babel — Prosody Conditioning
+Mimi — Prosody Conditioning
 =============================
 Applies energy matching and logs INF/cadence discrepancies between
 the original and translated/cloned audio tracks.
@@ -10,9 +10,9 @@ import shutil
 import subprocess
 from typing import Dict, Any
 
-from babel.exceptions import ProsodyError
-from babel.logger import get_logger
-from babel.prosody.extract import extract_prosody
+from mimi.exceptions import ProsodyError
+from mimi.logger import get_logger
+from mimi.prosody.extract import extract_prosody
 
 logger = get_logger(__name__)
 

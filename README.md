@@ -1,4 +1,4 @@
-# Babel 🗣️ → 🌐
+# Mimi 🗣️ → 🌐
 ### Emotion-Preserving AI Dubbing & Voice-Cloned Translation Pipeline
 
 > **Before you read anything else — watch the demo.**  
@@ -11,15 +11,15 @@
 
 ---
 
-## What Babel Does
+## What Mimi Does
 
-Babel takes a video of a person speaking in English and produces a dubbed version in Hindi, where:
+Mimi takes a video of a person speaking in English and produces a dubbed version in Hindi, where:
 
 1. **The same speaker's voice** is used — not a generic TTS robot voice
 2. **Lip movements are re-synced** to match the new audio
 3. **Emotional tone is preserved** — if you spoke the original with excitement, the Hindi output sounds excited too
 
-Most open-source dubbing tools produce flat, robotic-sounding translations. Babel's differentiator is a prosody-preservation layer that extracts pitch, energy, speaking rate, and emotional tone from the original delivery and conditions the translated speech to match.
+Most open-source dubbing tools produce flat, robotic-sounding translations. Mimi's differentiator is a prosody-preservation layer that extracts pitch, energy, speaking rate, and emotional tone from the original delivery and conditions the translated speech to match.
 
 ---
 
@@ -78,12 +78,12 @@ Dubbed Video (Hindi, cloned voice, preserved emotion)
 ### 1. Clone and set up
 
 ```bash
-git clone https://github.com/SAK_SHI14/babel.git
-cd babel
+git clone https://github.com/SAK_SHI14/mimi.git
+cd mimi
 
 # Create conda environment (recommended)
 conda env create -f environment.yml
-conda activate babel
+conda activate mimi
 
 # OR use pip directly (ensure Python 3.9)
 pip install -r requirements.txt
@@ -124,7 +124,7 @@ cp .env.example .env
 
 ```bash
 # Full pipeline: English video → Hindi dubbed video
-python -m babel.pipeline dub \
+python -m mimi.pipeline dub \
   --input samples/my_clip.mp4 \
   --target-lang hin_Deva \
   --output outputs/dubbed_hindi.mp4
@@ -133,7 +133,7 @@ python -m babel.pipeline dub \
 ### 6. Run the Gradio app
 
 ```bash
-python -m babel.app.launch
+python -m mimi.app.launch
 # Open http://localhost:7860
 ```
 
@@ -152,8 +152,8 @@ Docker is the **primary deployment artifact** — fully reproducible on any mach
 
 ```bash
 # 1. Clone and enter the repo
-git clone https://github.com/SAK_SHI14/babel.git
-cd babel
+git clone https://github.com/SAK_SHI14/mimi.git
+cd mimi
 
 # 2. Download Wav2Lip checkpoint (~400 MB)
 mkdir -p wav2lip_checkpoints
@@ -175,7 +175,7 @@ docker compose up --build
 ## HuggingFace Spaces (Tier-2 Public Demo)
 
 A public demo is deployed at:  
-🔗 **[babel — HuggingFace Space](https://huggingface.co/spaces/SAK_SHI14/babel)**
+🔗 **[mimi — HuggingFace Space](https://huggingface.co/spaces/SAK_SHI14/mimi)**
 *(Replace with your actual Space URL)*
 
 ### ZeroGPU mode
@@ -196,8 +196,8 @@ pip install huggingface_hub
 
 # Login and push
 huggingface-cli login
-huggingface-cli repo create babel --type space --space_sdk gradio
-git remote add space https://huggingface.co/spaces/SAK_SHI14/babel
+huggingface-cli repo create mimi --type space --space_sdk gradio
+git remote add space https://huggingface.co/spaces/SAK_SHI14/mimi
 git push space main
 ```
 
@@ -209,7 +209,7 @@ Since development has no local GPU, **Colab and Kaggle are the primary developme
 testing environments** — not just optional alternatives.
 
 ### Session startup (every session)
-1. Open `notebooks/babel_colab_template.ipynb` in Colab (or `babel_kaggle_template.ipynb` on Kaggle)
+1. Open `notebooks/mimi_colab_template.ipynb` in Colab (or `mimi_kaggle_template.ipynb` on Kaggle)
 2. Run all cells — takes ~5 min to restore the environment
 3. Then open `notebooks/phase1_setup.ipynb` for model installation and testing
 
@@ -230,7 +230,7 @@ After first download, models are cached to Google Drive. Subsequent sessions sta
 ## Project Structure
 
 ```
-babel/
+mimi/
 ├── asr/                  # Whisper transcription wrapper
 ├── translation/          # IndicTrans2 translation wrapper
 ├── voice_cloning/        # XTTS-v2 voice cloning wrapper
@@ -244,8 +244,8 @@ babel/
 ├── docs/
 │   └── adrs/             # Architecture Decision Records
 ├── notebooks/
-│   ├── babel_colab_template.ipynb   # Session starter — Colab
-│   ├── babel_kaggle_template.ipynb  # Session starter — Kaggle
+│   ├── mimi_colab_template.ipynb   # Session starter — Colab
+│   ├── mimi_kaggle_template.ipynb  # Session starter — Kaggle
 │   └── phase1_setup.ipynb           # Phase 1 model installation
 ├── samples/              # Your source video clips (not committed)
 ├── outputs/              # Pipeline outputs (not committed)
@@ -279,7 +279,7 @@ pytest -m integration -v
 
 To run the automated ablation study comparison (comparing default Emotion Conditioning **ON** vs. a neutral voice baseline **OFF**), execute:
 ```bash
-python -m babel.eval.ablation --input samples/sample_clip.mp4 --gold "नमस्ते, मेरा नाम साक्षी है और मैं यहाँ हूँ।"
+python -m mimi.eval.ablation --input samples/sample_clip.mp4 --gold "नमस्ते, मेरा नाम साक्षी है और मैं यहाँ हूँ।"
 ```
 This generates a detailed comparison report in [docs/eval_report.md](docs/eval_report.md). 
 

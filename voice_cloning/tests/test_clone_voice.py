@@ -1,7 +1,7 @@
 """
-Unit tests for babel.voice_cloning.clone_voice
+Unit tests for mimi.voice_cloning.clone_voice
 ===============================================
-Run with:  pytest babel/voice_cloning/tests/test_clone_voice.py -v
+Run with:  pytest mimi/voice_cloning/tests/test_clone_voice.py -v
 
 Smoke tests:
   - clone_voice() creates a non-empty output WAV file
@@ -17,7 +17,7 @@ from unittest.mock import MagicMock, patch, PropertyMock
 
 import pytest
 
-from babel.exceptions import VoiceCloningError
+from mimi.exceptions import VoiceCloningError
 
 
 # ---------------------------------------------------------------------------
@@ -84,8 +84,8 @@ class TestCloneVoice:
         """clone_voice() must create a non-empty WAV file at output_path."""
         output_path = str(tmp_path / "output" / "cloned.wav")
 
-        with patch("babel.voice_cloning.clone_voice._load_tts_model", return_value=mock_tts_model):
-            from babel.voice_cloning.clone_voice import clone_voice
+        with patch("mimi.voice_cloning.clone_voice._load_tts_model", return_value=mock_tts_model):
+            from mimi.voice_cloning.clone_voice import clone_voice
             result = clone_voice(
                 reference_audio_path=str(long_reference_wav),
                 text="This is a test sentence.",
@@ -102,8 +102,8 @@ class TestCloneVoice:
         """clone_voice() must return an absolute path string."""
         output_path = str(tmp_path / "cloned.wav")
 
-        with patch("babel.voice_cloning.clone_voice._load_tts_model", return_value=mock_tts_model):
-            from babel.voice_cloning.clone_voice import clone_voice
+        with patch("mimi.voice_cloning.clone_voice._load_tts_model", return_value=mock_tts_model):
+            from mimi.voice_cloning.clone_voice import clone_voice
             result = clone_voice(
                 reference_audio_path=str(long_reference_wav),
                 text="Test.",
@@ -115,7 +115,7 @@ class TestCloneVoice:
 
     def test_missing_reference_raises_file_not_found_error(self, tmp_path: Path):
         """clone_voice() must raise FileNotFoundError for missing reference."""
-        from babel.voice_cloning.clone_voice import clone_voice
+        from mimi.voice_cloning.clone_voice import clone_voice
         with pytest.raises(FileNotFoundError):
             clone_voice(
                 reference_audio_path="/nonexistent/reference.wav",
@@ -126,7 +126,7 @@ class TestCloneVoice:
 
     def test_short_reference_raises_value_error(self, short_reference_wav: Path, tmp_path: Path):
         """clone_voice() must raise ValueError when reference clip is < 6 seconds."""
-        from babel.voice_cloning.clone_voice import clone_voice
+        from mimi.voice_cloning.clone_voice import clone_voice
         with pytest.raises(ValueError, match="too short"):
             clone_voice(
                 reference_audio_path=str(short_reference_wav),
@@ -137,7 +137,7 @@ class TestCloneVoice:
 
     def test_empty_text_raises_value_error(self, long_reference_wav: Path, tmp_path: Path):
         """clone_voice() must raise ValueError for empty text input."""
-        from babel.voice_cloning.clone_voice import clone_voice
+        from mimi.voice_cloning.clone_voice import clone_voice
         with pytest.raises(ValueError):
             clone_voice(
                 reference_audio_path=str(long_reference_wav),
@@ -153,8 +153,8 @@ class TestCloneVoice:
         mock_model = MagicMock()
         mock_model.tts_to_file.side_effect = RuntimeError("CUDA out of memory")
 
-        with patch("babel.voice_cloning.clone_voice._load_tts_model", return_value=mock_model):
-            from babel.voice_cloning.clone_voice import clone_voice
+        with patch("mimi.voice_cloning.clone_voice._load_tts_model", return_value=mock_model):
+            from mimi.voice_cloning.clone_voice import clone_voice
             with pytest.raises(VoiceCloningError, match="synthesis failed"):
                 clone_voice(
                     reference_audio_path=str(long_reference_wav),
@@ -169,8 +169,8 @@ class TestCloneVoice:
         """clone_voice() must create nested output directories if they don't exist."""
         nested_output = str(tmp_path / "level1" / "level2" / "cloned.wav")
 
-        with patch("babel.voice_cloning.clone_voice._load_tts_model", return_value=mock_tts_model):
-            from babel.voice_cloning.clone_voice import clone_voice
+        with patch("mimi.voice_cloning.clone_voice._load_tts_model", return_value=mock_tts_model):
+            from mimi.voice_cloning.clone_voice import clone_voice
             result = clone_voice(
                 reference_audio_path=str(long_reference_wav),
                 text="Test.",
@@ -191,7 +191,7 @@ class TestGetAudioDuration:
         """_get_audio_duration() must return correct duration for a known WAV file."""
         wav_path = _create_wav(tmp_path / "test.wav", duration_s=5.0)
 
-        from babel.voice_cloning.clone_voice import _get_audio_duration
+        from mimi.voice_cloning.clone_voice import _get_audio_duration
         duration = _get_audio_duration(wav_path)
 
         # Allow ±100ms tolerance due to integer sample count rounding

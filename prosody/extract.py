@@ -1,5 +1,5 @@
 """
-Babel — Prosody Feature Extraction
+Mimi — Prosody Feature Extraction
 ===================================
 Extracts F0 (pitch) contours, RMS (energy) contours, speaking rate, and pauses
 from speech audio using librosa.
@@ -10,8 +10,8 @@ from typing import Dict, Any
 
 import numpy as np
 
-from babel.exceptions import ProsodyError
-from babel.logger import get_logger
+from mimi.exceptions import ProsodyError
+from mimi.logger import get_logger
 
 logger = get_logger(__name__)
 

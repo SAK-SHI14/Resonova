@@ -1,5 +1,5 @@
 # ============================================================
-# Babel — Pinned Requirements
+# Mimi — Pinned Requirements
 # ============================================================
 # CRITICAL NOTE ON WAV2LIP COMPATIBILITY:
 # Wav2Lip has strict dependency constraints that conflict with

@@ -1,5 +1,5 @@
 """
-Babel — Evaluation Metrics
+Mimi — Evaluation Metrics
 ===========================
 Calculates translation quality (BLEU, chrF), speaker similarity,
 and emotional cadence agreement (contour correlations) between
@@ -11,9 +11,9 @@ from typing import Dict, Any
 
 import numpy as np
 
-from babel.exceptions import EvaluationError
-from babel.logger import get_logger
-from babel.prosody.extract import extract_prosody
+from mimi.exceptions import EvaluationError
+from mimi.logger import get_logger
+from mimi.prosody.extract import extract_prosody
 
 logger = get_logger(__name__)
 

@@ -1,5 +1,5 @@
 """
-Unit tests for babel.pipeline.dub_video
+Unit tests for mimi.pipeline.dub_video
 ========================================
 Run with: pytest tests/test_pipeline.py -v
 """
@@ -11,15 +11,15 @@ from unittest.mock import MagicMock, patch, call
 
 import pytest
 
-from babel.exceptions import (
+from mimi.exceptions import (
     AudioExtractionError,
-    BabelError,
+    MimiError,
     LipSyncError,
     TranscriptionError,
     TranslationError,
     VoiceCloningError,
 )
-from babel.pipeline import dub_video, get_video_duration, time_stretch_audio
+from mimi.pipeline import dub_video, get_video_duration, time_stretch_audio
 
 
 @pytest.fixture
@@ -32,15 +32,15 @@ def dummy_video(tmp_path: Path) -> Path:
 @pytest.fixture
 def mock_subcomponents():
     """Mock all model-related functions in the pipeline to prevent real loading/running."""
-    with patch("babel.pipeline.transcribe") as mock_transcribe, \
-         patch("babel.pipeline.translate") as mock_translate, \
-         patch("babel.pipeline.clone_voice") as mock_clone_voice, \
-         patch("babel.pipeline.lipsync") as mock_lipsync, \
-         patch("babel.pipeline.extract_audio_from_video") as mock_extract, \
-         patch("babel.pipeline.time_stretch_audio") as mock_stretch, \
-         patch("babel.pipeline.get_audio_duration") as mock_duration, \
-         patch("babel.pipeline.get_video_duration") as mock_v_duration, \
-         patch("babel.pipeline.unload_all_models") as mock_unload:
+    with patch("mimi.pipeline.transcribe") as mock_transcribe, \
+         patch("mimi.pipeline.translate") as mock_translate, \
+         patch("mimi.pipeline.clone_voice") as mock_clone_voice, \
+         patch("mimi.pipeline.lipsync") as mock_lipsync, \
+         patch("mimi.pipeline.extract_audio_from_video") as mock_extract, \
+         patch("mimi.pipeline.time_stretch_audio") as mock_stretch, \
+         patch("mimi.pipeline.get_audio_duration") as mock_duration, \
+         patch("mimi.pipeline.get_video_duration") as mock_v_duration, \
+         patch("mimi.pipeline.unload_all_models") as mock_unload:
 
         # Default return values
         mock_transcribe.return_value = "Hello, this is a test."

@@ -3,7 +3,7 @@
 **Status:** Accepted  
 **Date:** Week 2, Phase 2  
 **Authors:** Sakshi Verma  
-**Context:** Project Babel — AI dubbing pipeline (English → Hindi)
+**Context:** Project Mimi — AI dubbing pipeline (English → Hindi)
 
 ---
 
@@ -77,7 +77,7 @@ We establish an warning threshold: if the speed ratio is outside the `[0.6, 1.6]
 
 ## Consequences
 
-- **Implementation**: Written using an `ffmpeg` subprocess in `babel/pipeline.py` with custom logic to chain `atempo` filters (since a single `atempo` filter in ffmpeg only supports ranges between 0.5 and 2.0).
+- **Implementation**: Written using an `ffmpeg` subprocess in `mimi/pipeline.py` with custom logic to chain `atempo` filters (since a single `atempo` filter in ffmpeg only supports ranges between 0.5 and 2.0).
 - **Quality**: Synthesized voices remain pitch-corrected, and the final MP4 video has perfectly aligned lip-sync and audio track length.
 
 ---

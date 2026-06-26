@@ -2,13 +2,13 @@
 **Status:** Accepted  
 **Date:** Week 1, Phase 1  
 **Authors:** Sakshi Verma  
-**Context:** Project Babel — emotion-preserving dubbing pipeline (English → Hindi)
+**Context:** Project Mimi — emotion-preserving dubbing pipeline (English → Hindi)
 
 ---
 
 ## Context
 
-Babel needs a voice cloning / TTS model that:
+Mimi needs a voice cloning / TTS model that:
 1. Performs **zero-shot voice cloning** (no fine-tuning on the target speaker's data)
 2. Supports **multilingual synthesis** — at minimum English and Hindi
 3. Is fully open-weight (no paid API — hard requirement)
@@ -41,7 +41,7 @@ Babel needs a voice cloning / TTS model that:
 | Open-weight | ✅ MIT licensed |
 | VRAM | ~4–6 GB for large variant |
 | Voice similarity | Lower than XTTS-v2 for speaker identity preservation |
-| Suitability for Babel | ❌ Hindi support is insufficient for the primary use case |
+| Suitability for Mimi | ❌ Hindi support is insufficient for the primary use case |
 
 ### Option C: YourTTS
 
@@ -50,7 +50,7 @@ Babel needs a voice cloning / TTS model that:
 | Zero-shot cloning | ✅ Yes |
 | Hindi support | ❌ Not supported (English, Portuguese, French only) |
 | Open-weight | ✅ MIT licensed |
-| Suitability for Babel | ❌ Eliminated due to no Hindi support |
+| Suitability for Mimi | ❌ Eliminated due to no Hindi support |
 
 ### Option D: OpenVoice (MyShell AI)
 
@@ -62,7 +62,7 @@ Babel needs a voice cloning / TTS model that:
 | VRAM | ~2–3 GB |
 | Voice similarity | Good for English; Hindi quality untested at scale |
 | Active maintenance | ✅ Actively maintained as of 2024 |
-| Suitability for Babel | Viable alternative but less documented for Hindi than XTTS-v2 |
+| Suitability for Mimi | Viable alternative but less documented for Hindi than XTTS-v2 |
 
 ---
 
@@ -72,11 +72,11 @@ Babel needs a voice cloning / TTS model that:
 
 ### Rationale
 
-1. **Hindi is non-negotiable**: Babel's primary output language is Hindi. XTTS-v2 is the most tested open-weight zero-shot TTS model with documented Hindi support. YourTTS and Bark are eliminated outright.
+1. **Hindi is non-negotiable**: Mimi's primary output language is Hindi. XTTS-v2 is the most tested open-weight zero-shot TTS model with documented Hindi support. YourTTS and Bark are eliminated outright.
 
 2. **Voice similarity quality**: XTTS-v2 produces the highest speaker-similarity scores among the evaluated open-weight models for the English reference → Hindi synthesis use case.
 
-3. **Zero-shot cloning from a short clip**: XTTS-v2 requires only 6+ seconds of reference audio with no fine-tuning — this matches Babel's design goal of working with any speaker's recording without training.
+3. **Zero-shot cloning from a short clip**: XTTS-v2 requires only 6+ seconds of reference audio with no fine-tuning — this matches Mimi's design goal of working with any speaker's recording without training.
 
 4. **Documented in the prosody pipeline**: XTTS-v2's `speaker_wav` parameter accepts a reference clip that influences not just speaker identity but also prosody style — this is the hook Phase 3 will use for reference-style emotion conditioning (ADR-004, to be written in Phase 3).
 
@@ -85,7 +85,7 @@ Babel needs a voice cloning / TTS model that:
 Coqui the company shut down in January 2024. This is a real risk worth documenting:
 - The model weights remain on HuggingFace and will not disappear in the near term
 - The `TTS` pip package continues to work from PyPI
-- Babel pins the working version (`TTS==0.22.0`) to prevent silent breakage from future changes
+- Mimi pins the working version (`TTS==0.22.0`) to prevent silent breakage from future changes
 - If XTTS-v2 becomes unavailable, OpenVoice is the documented fallback
 
 ### Known Limitations (documented, not hidden)

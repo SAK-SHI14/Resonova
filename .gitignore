@@ -1,4 +1,4 @@
-# Babel .gitignore
+# Mimi .gitignore
 
 # ─── Model Weights (large files — do NOT commit) ───
 *.pth
@@ -33,7 +33,7 @@ build/
 .venv/
 venv/
 env/
-babel_env/
+mimi_env/
 
 # ─── Jupyter ───
 .ipynb_checkpoints/

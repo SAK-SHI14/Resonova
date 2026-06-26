@@ -1,15 +1,15 @@
 """
-Babel package setup — enables `pip install -e .` for editable installs
-on Colab/Kaggle so that `from babel.asr.transcribe import transcribe` works.
+Mimi package setup — enables `pip install -e .` for editable installs
+on Colab/Kaggle so that `from mimi.asr.transcribe import transcribe` works.
 """
 
 from setuptools import setup, find_packages
 
 setup(
-    name="babel-dubbing",
+    name="mimi-dubbing",
     version="0.1.0",
     description=(
-        "Babel: Emotion-preserving AI dubbing and voice-cloned translation pipeline. "
+        "Mimi: Emotion-preserving AI dubbing and voice-cloned translation pipeline. "
         "English → Hindi using Whisper, IndicTrans2, XTTS-v2, and Wav2Lip."
     ),
     author="Sakshi Verma",

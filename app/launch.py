@@ -1,10 +1,10 @@
 """
-babel.app.launch
+mimi.app.launch
 ================
-Entry point for launching the Babel Gradio app locally or via Docker.
+Entry point for launching the Mimi Gradio app locally or via Docker.
 
 Usage:
-    python -m babel.app.launch           # local run
+    python -m mimi.app.launch           # local run
     docker compose up                     # Docker run (same entrypoint)
 
 The app is available at http://localhost:7860 after startup.
@@ -18,7 +18,7 @@ import logging
 import os
 import sys
 
-from babel.logger import get_logger
+from mimi.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -26,7 +26,7 @@ logger = get_logger(__name__)
 def main() -> None:
     """Launch the Gradio application."""
     logger.info("=" * 60)
-    logger.info("Babel — Starting Gradio application")
+    logger.info("Mimi — Starting Gradio application")
     logger.info("=" * 60)
 
     # ── Validate environment ───────────────────────────────────────────────
@@ -76,7 +76,7 @@ def main() -> None:
     logger.info("Starting Gradio server on %s:%d", server_name, server_port)
     logger.info("Open http://localhost:%d in your browser", server_port)
 
-    from babel.app.app import create_app
+    from mimi.app.app import create_app
     demo = create_app()
 
     demo.launch(

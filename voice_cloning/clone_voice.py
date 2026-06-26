@@ -1,5 +1,5 @@
 """
-Babel — Voice Cloning Module
+Mimi — Voice Cloning Module
 ==============================
 Wrapper around Coqui XTTS-v2 for zero-shot voice cloning and multilingual TTS.
 
@@ -24,7 +24,7 @@ Supported Languages (partial list — full list in XTTS-v2 model card):
   hu (Hungarian), ko (Korean)
 
 Usage:
-    from babel.voice_cloning.clone_voice import clone_voice
+    from mimi.voice_cloning.clone_voice import clone_voice
     output_path = clone_voice(
         reference_audio_path="samples/my_voice_reference.wav",
         text="नमस्ते, यह एक परीक्षण वाक्य है।",
@@ -38,8 +38,8 @@ import time
 from pathlib import Path
 from typing import Optional
 
-from babel.exceptions import VoiceCloningError
-from babel.logger import get_logger
+from mimi.exceptions import VoiceCloningError
+from mimi.logger import get_logger
 
 logger = get_logger(__name__)
 

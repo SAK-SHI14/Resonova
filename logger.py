@@ -1,11 +1,11 @@
 """
-Babel — Shared logging configuration.
+Mimi — Shared logging configuration.
 
-Every module in the Babel pipeline imports get_logger() from here to ensure
+Every module in the Mimi pipeline imports get_logger() from here to ensure
 consistent log format, level, and structured output across all pipeline stages.
 
 Usage:
-    from babel.logger import get_logger
+    from mimi.logger import get_logger
     logger = get_logger(__name__)
     logger.info("Stage complete", extra={"stage": "asr", "duration_s": 4.2})
 """
@@ -46,7 +46,7 @@ def _configure_root_logger() -> None:
 
 def get_logger(name: Optional[str] = None) -> logging.Logger:
     """
-    Return a named logger with Babel's standard formatting applied.
+    Return a named logger with Mimi's standard formatting applied.
 
     Args:
         name: Logger name, typically ``__name__`` of the calling module.
@@ -55,4 +55,4 @@ def get_logger(name: Optional[str] = None) -> logging.Logger:
         A configured :class:`logging.Logger` instance.
     """
     _configure_root_logger()
-    return logging.getLogger(name or "babel")
+    return logging.getLogger(name or "mimi")
