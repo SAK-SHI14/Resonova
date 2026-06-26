@@ -153,6 +153,7 @@ def dub_video(
     model_size_asr: str = "medium",
     model_name_translation: Optional[str] = None,
     model_name_xtts: Optional[str] = None,
+    voice_reference_path: Optional[str] = None,
 ) -> str:
     """
     Translate and dub a video of a person speaking English to a target language (default Hindi)
@@ -202,9 +203,11 @@ def dub_video(
     original_audio_path = ckpt_dir / "extracted_audio.wav"
     transcript_path = ckpt_dir / "transcript.txt"
     translated_text_path = ckpt_dir / "translated_text.txt"
-    cloned_audio_raw_path = ckpt_dir / "cloned_audio_raw.wav"
-    cloned_audio_synced_path = ckpt_dir / "cloned_audio_synced.wav"
-    final_video_temp_path = ckpt_dir / "dubbed_video_temp.mp4"
+
+    suffix = "_neutral" if voice_reference_path else ""
+    cloned_audio_raw_path = ckpt_dir / f"cloned_audio_raw{suffix}.wav"
+    cloned_audio_synced_path = ckpt_dir / f"cloned_audio_synced{suffix}.wav"
+    final_video_temp_path = ckpt_dir / f"dubbed_video_temp{suffix}.mp4"
 
     # --- STAGE 1: Audio Extraction ---
     t0 = time.perf_counter()
@@ -272,8 +275,9 @@ def dub_video(
             unload_all_models()
             # XTTS requires language code like 'hi' instead of 'hin_Deva'
             lang_short = "hi" if target_lang == "hin_Deva" else target_lang.split("_")[0]
+            ref_path = voice_reference_path if voice_reference_path else original_audio_path
             clone_voice(
-                reference_audio_path=str(original_audio_path),
+                reference_audio_path=str(ref_path),
                 text=translated_text,
                 language=lang_short,
                 output_path=str(cloned_audio_raw_path),
