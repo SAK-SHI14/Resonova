@@ -1,0 +1,59 @@
+# Babel .gitignore
+
+# ─── Model Weights (large files — do NOT commit) ───
+*.pth
+*.pt
+*.bin
+*.ckpt
+*.safetensors
+checkpoints/
+
+# ─── Your Personal Source Clips (never commit these) ───
+samples/
+outputs/
+
+# ─── Environment files ───
+.env
+!.env.example
+
+# ─── Python ───
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+.pytest_cache/
+.mypy_cache/
+*.so
+
+# ─── Virtual environments ───
+.venv/
+venv/
+env/
+babel_env/
+
+# ─── Jupyter ───
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ─── IDE ───
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ─── OS ───
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Logs ───
+*.log
+logs/
+
+# ─── Downloaded repos (not committed — documented in README) ───
+IndicTrans2/
+Wav2Lip/

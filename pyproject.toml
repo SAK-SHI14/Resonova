@@ -1,0 +1,34 @@
+[tool.pytest.ini_options]
+# Run from the project root: pytest
+testpaths = [
+    "asr/tests",
+    "translation/tests",
+    "voice_cloning/tests",
+    "lipsync/tests",
+    "tests",
+]
+python_files  = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+# Markers
+markers = [
+    "integration: marks tests that require a GPU environment and real model weights (deselect with -m 'not integration')",
+    "slow: marks tests that take >10 seconds",
+]
+
+# Timeouts
+timeout = 30  # individual unit tests should not exceed 30 seconds
+
+# Show local variables in tracebacks for debugging
+log_cli = true
+log_cli_level = "INFO"
+log_format = "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
+log_date_format = "%H:%M:%S"
+
+# Fail on warnings we care about
+filterwarnings = [
+    "error::DeprecationWarning",
+    "ignore::DeprecationWarning:pkg_resources",
+    "ignore::DeprecationWarning:google",
+]

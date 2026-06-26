@@ -1,0 +1,61 @@
+# ============================================================
+# Babel — .dockerignore
+# ============================================================
+# Keeps the Docker build context small by excluding files that
+# are not needed inside the container.
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+.env/
+
+# Pytest cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Git
+.git/
+.gitignore
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Local secrets / environment files
+.env
+*.env.local
+
+# Large data directories (not needed in the image)
+outputs/
+samples/
+wav2lip_checkpoints/
+
+# Notebooks (not needed in the runtime container)
+notebooks/
+
+# Documentation (not needed in the runtime container)
+docs/
+
+# HuggingFace cache (managed via Docker volume, not baked into image)
+.cache/
+
+# OS files
+.DS_Store
+desktop.ini

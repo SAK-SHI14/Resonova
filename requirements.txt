@@ -1,0 +1,108 @@
+# ============================================================
+# Babel — Pinned Requirements
+# ============================================================
+# CRITICAL NOTE ON WAV2LIP COMPATIBILITY:
+# Wav2Lip has strict dependency constraints that conflict with
+# the latest versions of several packages. The versions below
+# represent the working combination as of Phase 1 testing.
+# DO NOT upgrade these without re-testing the full lipsync pipeline.
+#
+# If you hit conflicts, see notes.md for the troubleshooting log.
+# ============================================================
+
+# ----- Core Python Ecosystem -----
+python-dotenv==1.0.0
+
+# ----- Logging -----
+# Using standard library logging — no extra package needed
+
+# ----- ASR: OpenAI Whisper -----
+openai-whisper==20231117
+# Whisper requires ffmpeg installed at system level (not pip):
+# On Colab: !apt-get install ffmpeg -y
+# On local: install via conda or system package manager
+
+# ----- Translation: IndicTrans2 (AI4Bharat) -----
+# IndicTrans2 is not pip-installable directly; it's installed from source:
+# git clone https://github.com/AI4Bharat/IndicTrans2
+# pip install -e IndicTrans2/
+# HuggingFace transformers must be compatible:
+transformers==4.35.2
+sentencepiece==0.1.99
+sacremoses==0.0.53
+# IndicTrans2 also needs:
+indic-nlp-library==0.91
+mosestokenizer==1.2.1
+
+# ----- Voice Cloning: Coqui XTTS-v2 -----
+# TTS installs XTTS-v2 and all its dependencies
+TTS==0.22.0
+# Note: TTS will pull in its own torch version if not already installed.
+# Install torch BEFORE TTS to control the version.
+
+# ----- Lip-Sync: Wav2Lip -----
+# Wav2Lip is NOT pip-installable. It's run via subprocess from its repo.
+# Clone: git clone https://github.com/Rudrabha/Wav2Lip
+# The following packages are Wav2Lip's dependencies:
+
+# PyTorch — WAV2LIP REQUIRES THIS EXACT RANGE
+# Install BEFORE other packages to avoid version conflicts.
+# On Colab T4 (CUDA 11.3+), use:
+# pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113
+# Pinning for reference:
+torch==1.12.1
+torchvision==0.13.1
+
+# Face detection — Wav2Lip specific
+# face_alignment 1.3.5 is the last version with compatible API
+face-alignment==1.3.5
+
+# OpenCV — used by Wav2Lip and lipsync module
+opencv-python==4.5.5.64
+opencv-contrib-python==4.5.5.64
+
+# Audio processing
+librosa==0.8.1          # 0.9+ has mel-spec API changes that break Wav2Lip
+soundfile==0.10.3
+audioread==2.1.9
+
+# NumPy — must be <1.24 for Wav2Lip's np.bool usage
+numpy==1.23.5
+
+# ----- Prosody Analysis (Phase 3, pre-declared) -----
+pyworld==0.3.4          # pitch extraction (HARVEST/STONEMASK algorithms)
+# librosa already declared above
+
+# ----- Evaluation (Phase 3, pre-declared) -----
+resemblyzer==0.1.3      # speaker similarity
+jiwer==3.0.3            # WER/CER metrics
+sacrebleu==2.3.1        # BLEU / chrF for translation evaluation
+# SpeechBrain: install from source or pip if resemblyzer insufficient
+# pip install speechbrain==0.5.15
+
+# ----- Audio Utilities -----
+pydub==0.25.1           # audio format conversion
+ffmpeg-python==0.2.0    # Python wrapper around ffmpeg binary
+
+# ----- App (Phase 4, pre-declared) -----
+gradio==4.19.2
+
+# ----- Testing -----
+pytest==7.4.4
+pytest-timeout==2.2.0
+
+# ----- Misc -----
+tqdm==4.66.1
+requests==2.31.0
+Pillow==9.5.0           # pinned for numpy/Wav2Lip compat
+
+# ============================================================
+# SYSTEM-LEVEL DEPENDENCIES (not pip — must install separately)
+# ============================================================
+# ffmpeg: required by Whisper and pydub
+#   Colab:  !apt-get install -y ffmpeg
+#   Conda:  conda install -c conda-forge ffmpeg
+#
+# cmake, build-essential: required for some face_alignment builds
+#   Colab:  !apt-get install -y cmake build-essential
+# ============================================================
