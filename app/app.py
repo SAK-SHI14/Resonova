@@ -94,20 +94,37 @@ def run_dubbing_pipeline(video_file, target_language: str) -> tuple[str, str]:
         logger.warning("No video file provided")
         return None, "❌ No video uploaded. Please upload a video file."
 
-    # Simulate pipeline latency for UI testing
-    time.sleep(1.0)
+    try:
+        from babel.pipeline import dub_video  # noqa: PLC0415
+        
+        # Map target dropdown selection to standard internal BCP-47 codes
+        lang_map = {
+            "Hindi": "hin_Deva"
+        }
+        internal_lang = lang_map.get(target_language, "hin_Deva")
 
-    status = (
-        f"🚧 **Phase 0 Stub** — pipeline not yet wired.\n\n"
-        f"Received: `{os.path.basename(video_file)}`\n"
-        f"Target language: **{target_language}**\n\n"
-        f"The full dubbing pipeline (Whisper → IndicTrans2 → XTTS-v2 → Wav2Lip) "
-        f"will be connected here in Phase 4.\n\n"
-        f"ZeroGPU active: `{_ZEROGPU_AVAILABLE}`"
-    )
+        logger.info("[App UI] Starting dubbing pipeline for video='%s'", os.path.basename(video_file))
+        t_start = time.perf_counter()
 
-    logger.info("Stub response returned — Phase 0")
-    return None, status
+        # Run pipeline
+        output_video_path = dub_video(
+            video_path=video_file,
+            target_lang=internal_lang,
+        )
+
+        elapsed = time.perf_counter() - t_start
+        status_msg = (
+            f"✅ **Dubbing Complete!**\n\n"
+            f"Processed: `{os.path.basename(video_file)}` → `{os.path.basename(output_video_path)}`\n"
+            f"Total duration: **{elapsed:.1f}s**"
+        )
+        logger.info("[App UI] Pipeline completed successfully in %.2fs", elapsed)
+        return output_video_path, status_msg
+
+    except Exception as exc:
+        err_msg = f"❌ **Dubbing Failed:** {exc}"
+        logger.error("[App UI] Pipeline execution failed: %s", exc, exc_info=True)
+        return None, err_msg
 
 
 # ─── Gradio UI ───────────────────────────────────────────────────────────────

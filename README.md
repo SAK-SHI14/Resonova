@@ -78,7 +78,7 @@ Dubbed Video (Hindi, cloned voice, preserved emotion)
 ### 1. Clone and set up
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/babel.git
+git clone https://github.com/SAK_SHI14/babel.git
 cd babel
 
 # Create conda environment (recommended)
@@ -152,7 +152,7 @@ Docker is the **primary deployment artifact** — fully reproducible on any mach
 
 ```bash
 # 1. Clone and enter the repo
-git clone https://github.com/YOUR_USERNAME/babel.git
+git clone https://github.com/SAK_SHI14/babel.git
 cd babel
 
 # 2. Download Wav2Lip checkpoint (~400 MB)
@@ -175,7 +175,7 @@ docker compose up --build
 ## HuggingFace Spaces (Tier-2 Public Demo)
 
 A public demo is deployed at:  
-🔗 **[babel — HuggingFace Space](https://huggingface.co/spaces/YOUR_USERNAME/babel)**
+🔗 **[babel — HuggingFace Space](https://huggingface.co/spaces/SAK_SHI14/babel)**
 *(Replace with your actual Space URL)*
 
 ### ZeroGPU mode
@@ -197,7 +197,7 @@ pip install huggingface_hub
 # Login and push
 huggingface-cli login
 huggingface-cli repo create babel --type space --space_sdk gradio
-git remote add space https://huggingface.co/spaces/YOUR_USERNAME/babel
+git remote add space https://huggingface.co/spaces/SAK_SHI14/babel
 git push space main
 ```
 
