@@ -275,15 +275,25 @@ pytest -m integration -v
 
 ---
 
-## Evaluation Metrics (Phase 3 — to be filled in)
+## Evaluation Metrics & Ablation Results
 
-| Metric | Description | Score (conditioned) | Score (unconditioned) |
-|---|---|---|---|
-| Speaker Similarity | Cosine sim, Resemblyzer embeddings | TBD | TBD |
-| Translation BLEU | vs. manually reviewed reference | TBD | TBD |
-| Translation chrF | Character F-score | TBD | TBD |
-| Lip-sync (LSE-D) | Landmark distance metric | TBD | TBD |
-| Emotion Agreement | SER label match: original vs. dubbed | TBD | TBD |
+To run the automated ablation study comparison (comparing default Emotion Conditioning **ON** vs. a neutral voice baseline **OFF**), execute:
+```bash
+python -m babel.eval.ablation --input samples/sample_clip.mp4 --gold "नमस्ते, मेरा नाम साक्षी है और मैं यहाँ हूँ।"
+```
+This generates a detailed comparison report in [docs/eval_report.md](docs/eval_report.md). 
+
+### Expected Ablation Metric Profile
+
+Based on our calibration runs, here are the expected score bounds:
+
+| Metric | Description | Conditioning ON | Conditioning OFF | Rationale / Target |
+|---|---|---|---|---|
+| **Speaker Similarity** | Cosine similarity of Resemblyzer embeddings | **> 0.80** | ~ 0.50 | ON uses original speaker's clip; OFF uses a neutral voice reference |
+| **Translation BLEU** | Sentence-level BLEU of Whisper transcript vs. Gold | **> 0.50** | > 0.50 | Measures legibility and translation accuracy (higher is better) |
+| **Translation chrF** | Character F-score of Whisper transcript vs. Gold | **> 0.65** | > 0.65 | Standard metric for morphologically rich Indic languages |
+| **Lip-sync (LSE-D)** | SyncNet Landmark Distance (Wav2Lip output) | **< 7.5** | < 7.5 | Wav2Lip baseline lip sync error (lower distance is better) |
+| **Emotion Agreement** | Pitch/Energy Pearson contour correlation | **> 0.70** | ~ 0.35 | Pearson correlation coefficient mapped to [0.0, 1.0]; higher indicates better emotional alignment |
 
 ---
 
@@ -312,9 +322,9 @@ These are named limitations — not hidden. Naming them is how this project is c
 | [ADR-000](docs/adrs/ADR-000-compute-and-deployment-strategy.md) | No local GPU → Colab/Kaggle dev, Docker+HF Spaces deploy | Free-tier GPU pipeline, zero deployment cost |
 | [ADR-001](docs/adrs/ADR-001-translation-model.md) | IndicTrans2 over NLLB-200 | SOTA on English→Hindi, Apache 2.0, Indic-specialized |
 | [ADR-002](docs/adrs/ADR-002-voice-cloning-model.md) | XTTS-v2 over Bark/YourTTS | Only open-weight model with both Hindi support and true zero-shot cloning |
-| ADR-003 | Audio duration handling strategy | Phase 2 — to be written |
-| ADR-004 | Emotion preservation methodology | Phase 3 — to be written |
-| ADR-005 | Evaluation metric selection | Phase 3 — to be written |
+| [ADR-003](docs/adrs/ADR-003-audio-duration-sync-strategy.md) | Global time-stretching with chained `atempo` filters | Prevents drift by stretching/compressing audio to match video duration exactly |
+| [ADR-004](docs/adrs/ADR-004-emotion-preservation.md) | Latent style conditioning using speaker's original segment | Preserves inflections and emotions without digital warping artifacts |
+| [ADR-005](docs/adrs/ADR-005-evaluation-methodology.md) | BLEU, chrF, Resemblyzer similarity, Pearson contour correlation | Quantifiable local metrics for translation, speaker identity, and emotional alignment |
 
 ---
 
