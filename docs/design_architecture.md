@@ -1,12 +1,12 @@
-# Mimi — System Design & Architecture Document
+# Vaani — System Design & Architecture Document
 
-This document presents the detailed architectural design, data flow, component breakdown, and engineering decisions for **Mimi**, an emotion-preserving AI video dubbing and voice-cloned translation pipeline (English to Hindi).
+This document presents the detailed architectural design, data flow, component breakdown, and engineering decisions for **Vaani**, an emotion-preserving AI video dubbing and voice-cloned translation pipeline (English to Hindi).
 
 ---
 
 ## 1. High-Level Architecture Overview
 
-Mimi is designed as a sequential multi-stage pipeline where each model runs independently to avoid VRAM over-allocation. The orchestrator manages the loading and unloading of model weights in CPU/GPU memory, ensuring compatibility with free-tier cloud GPUs (e.g. 15GB VRAM limit).
+Vaani is designed as a sequential multi-stage pipeline where each model runs independently to avoid VRAM over-allocation. The orchestrator manages the loading and unloading of model weights in CPU/GPU memory, ensuring compatibility with free-tier cloud GPUs (e.g. 15GB VRAM limit).
 
 ```mermaid
 graph TD
@@ -67,7 +67,7 @@ graph TD
 
 ## 3. Data Flow & Orchestrator Lifecycles
 
-The pipeline is coordinated sequentially by `mimi.pipeline.dub_video()`. To run within standard memory footprints, it utilizes a load-on-demand strategy:
+The pipeline is coordinated sequentially by `vaani.pipeline.dub_video()`. To run within standard memory footprints, it utilizes a load-on-demand strategy:
 
 1. **Audio Stage**: Extract source audio $\rightarrow$ Free memory.
 2. **ASR Stage**: Load Whisper $\rightarrow$ Transcribe $\rightarrow$ Unload Whisper $\rightarrow$ Free VRAM (`torch.cuda.empty_cache()`).

@@ -1,15 +1,15 @@
 """
-Mimi package setup — enables `pip install -e .` for editable installs
-on Colab/Kaggle so that `from mimi.asr.transcribe import transcribe` works.
+Vaani package setup — enables `pip install -e .` for editable installs
+on Colab/Kaggle so that `from vaani.asr.transcribe import transcribe` works.
 """
 
 from setuptools import setup, find_packages
 
 setup(
-    name="mimi-dubbing",
+    name="vaani-dubbing",
     version="0.1.0",
     description=(
-        "Mimi: Emotion-preserving AI dubbing and voice-cloned translation pipeline. "
+        "Vaani: Emotion-preserving AI dubbing and voice-cloned translation pipeline. "
         "English → Hindi using Whisper, IndicTrans2, XTTS-v2, and Wav2Lip."
     ),
     author="Sakshi Verma",

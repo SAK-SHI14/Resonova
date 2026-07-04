@@ -2,13 +2,13 @@
 **Status:** Accepted  
 **Date:** Week 1, Phase 1  
 **Authors:** Sakshi Verma  
-**Context:** Project Mimi — emotion-preserving dubbing pipeline (English → Hindi)
+**Context:** Project Vaani — emotion-preserving dubbing pipeline (English → Hindi)
 
 ---
 
 ## Context
 
-Mimi needs a translation model that:
+Vaani needs a translation model that:
 1. Produces high-quality English → Hindi translation (primary pair)
 2. Is fully open-weight (no paid API — hard requirement)
 3. Can run on a free-tier T4 GPU (~15 GB VRAM)
@@ -55,11 +55,11 @@ Two primary candidates were evaluated:
 
 ### Rationale
 
-1. **Domain fit**: Mimi's primary use case is English → Hindi for media dubbing. IndicTrans2 was trained and benchmarked specifically on Indic language pairs — this is exactly its design goal, not a side use case.
+1. **Domain fit**: Vaani's primary use case is English → Hindi for media dubbing. IndicTrans2 was trained and benchmarked specifically on Indic language pairs — this is exactly its design goal, not a side use case.
 
 2. **Quality on primary pair**: IndicTrans2 consistently outperforms NLLB-200 on English→Hindi benchmarks (Flores-200, IN22 benchmarks). For a portfolio project being evaluated on technical depth, using the SOTA model for the specific task is the right choice.
 
-3. **Extensibility**: IndicTrans2 covers all 22 Indian official languages. If Mimi later adds Tamil, Bengali, or other targets, the same model handles it without a model swap.
+3. **Extensibility**: IndicTrans2 covers all 22 Indian official languages. If Vaani later adds Tamil, Bengali, or other targets, the same model handles it without a model swap.
 
 4. **License**: Apache 2.0 (vs NLLB's CC-BY-NC). Apache 2.0 is more permissive for portfolio/demo use and potential future commercial application.
 

@@ -1,5 +1,5 @@
 """
-Unit tests for mimi.pipeline.dub_video
+Unit tests for vaani.pipeline.dub_video
 ========================================
 Run with: pytest tests/test_pipeline.py -v
 """
@@ -11,15 +11,15 @@ from unittest.mock import MagicMock, patch, call
 
 import pytest
 
-from mimi.exceptions import (
+from vaani.exceptions import (
     AudioExtractionError,
-    MimiError,
+    VaaniError,
     LipSyncError,
     TranscriptionError,
     TranslationError,
     VoiceCloningError,
 )
-from mimi.pipeline import dub_video, get_video_duration, time_stretch_audio
+from vaani.pipeline import dub_video, get_video_duration, time_stretch_audio
 
 
 @pytest.fixture
@@ -32,15 +32,15 @@ def dummy_video(tmp_path: Path) -> Path:
 @pytest.fixture
 def mock_subcomponents():
     """Mock all model-related functions in the pipeline to prevent real loading/running."""
-    with patch("mimi.pipeline.transcribe") as mock_transcribe, \
-         patch("mimi.pipeline.translate") as mock_translate, \
-         patch("mimi.pipeline.clone_voice") as mock_clone_voice, \
-         patch("mimi.pipeline.lipsync") as mock_lipsync, \
-         patch("mimi.pipeline.extract_audio_from_video") as mock_extract, \
-         patch("mimi.pipeline.time_stretch_audio") as mock_stretch, \
-         patch("mimi.pipeline.get_audio_duration") as mock_duration, \
-         patch("mimi.pipeline.get_video_duration") as mock_v_duration, \
-         patch("mimi.pipeline.unload_all_models") as mock_unload:
+    with patch("vaani.pipeline.transcribe") as mock_transcribe, \
+         patch("vaani.pipeline.translate") as mock_translate, \
+         patch("vaani.pipeline.clone_voice") as mock_clone_voice, \
+         patch("vaani.pipeline.lipsync") as mock_lipsync, \
+         patch("vaani.pipeline.extract_audio_from_video") as mock_extract, \
+         patch("vaani.pipeline.time_stretch_audio") as mock_stretch, \
+         patch("vaani.pipeline.get_audio_duration") as mock_duration, \
+         patch("vaani.pipeline.get_video_duration") as mock_v_duration, \
+         patch("vaani.pipeline.unload_all_models") as mock_unload:
 
         # Default return values
         mock_transcribe.return_value = "Hello, this is a test."

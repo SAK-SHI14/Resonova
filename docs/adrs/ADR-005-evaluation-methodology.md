@@ -3,13 +3,13 @@
 **Status:** Accepted  
 **Date:** Week 3, Phase 3  
 **Authors:** Sakshi Verma  
-**Context:** Project Mimi — evaluation suite
+**Context:** Project Vaani — evaluation suite
 
 ---
 
 ## Context
 
-Mimi needs a quantitative evaluation suite to measure the pipeline's performance across multiple dimensions:
+Vaani needs a quantitative evaluation suite to measure the pipeline's performance across multiple dimensions:
 1. **Translation Accuracy**: Does the Hindi output represent the same meaning?
 2. **Speaker Similarity**: Does the cloned voice sound like the original speaker?
 3. **Emotion/Prosody Preservation**: Is the emotional cadence (pace, pitch inflections, intensity) preserved?

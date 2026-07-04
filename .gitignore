@@ -1,4 +1,4 @@
-# Mimi .gitignore
+# Vaani .gitignore
 
 # ─── Model Weights (large files — do NOT commit) ───
 *.pth
@@ -33,7 +33,7 @@ build/
 .venv/
 venv/
 env/
-mimi_env/
+vaani_env/
 
 # ─── Jupyter ───
 .ipynb_checkpoints/

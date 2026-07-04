@@ -1,5 +1,5 @@
 """
-conftest.py — Shared pytest fixtures for the Mimi test suite.
+conftest.py — Shared pytest fixtures for the Vaani test suite.
 
 Fixtures defined here are available to all tests without explicit imports.
 """

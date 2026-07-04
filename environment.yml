@@ -1,4 +1,4 @@
-name: mimi
+name: vaani
 channels:
   - pytorch
   - nvidia

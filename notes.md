@@ -1,4 +1,4 @@
-# Mimi — Dependency & Troubleshooting Notes
+# Vaani — Dependency & Troubleshooting Notes
 _Living document. Updated as issues are hit and resolved. Becomes the backbone of ADRs and README troubleshooting section._
 
 ---

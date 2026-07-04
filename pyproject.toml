@@ -1,10 +1,10 @@
 [tool.pytest.ini_options]
 # Run from the project root: pytest
 testpaths = [
-    "asr/tests",
-    "translation/tests",
-    "voice_cloning/tests",
-    "lipsync/tests",
+    "vaani/asr/tests",
+    "vaani/translation/tests",
+    "vaani/voice_cloning/tests",
+    "vaani/lipsync/tests",
     "tests",
 ]
 python_files  = ["test_*.py"]
