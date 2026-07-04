@@ -1,15 +1,4 @@
 # Vaani 🗣️ → 🌐
-### Emotion-Preserving AI Dubbing & Voice-Cloned Translation Pipeline
-
-> **Before you read anything else — watch the demo.**  
-> *[Insert before/after clip here — record this as your very first Loom section]*
-
-> ⚠️ **Compute note:** This project requires a CUDA GPU. No local GPU was available during
-> development — all model training and inference was done via free-tier **Google Colab T4**
-> and **Kaggle T4/P100** notebooks (see `/notebooks`). See [ADR-000](docs/adrs/ADR-000-compute-and-deployment-strategy.md)
-> for the full compute and deployment strategy.
-
----
 
 ## What Vaani Does
 
