@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vaani — Human Evaluation Survey Form</title>
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-hover: #6d28d9;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(124, 58, 237, 0.2);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0 0 0.5rem 0;
+            background: linear-gradient(to right, #a78bfa, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .instructions-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+        }
+
+        .instructions-card h2 {
+            margin-top: 0;
+            font-size: 1.3rem;
+            color: var(--accent);
+        }
+
+        .instructions-card ol {
+            margin: 0;
+            padding-left: 1.2rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .instructions-card li {
+            margin-bottom: 0.5rem;
+        }
+
+        .clip-pair-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .clip-pair-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(124, 58, 237, 0.4);
+        }
+
+        .clip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .clip-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #c084fc;
+            margin: 0;
+        }
+
+        .clip-badge {
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--accent);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .audio-players {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 600px) {
+            .audio-players {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .audio-player-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .audio-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        audio {
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        .question-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .question-text {
+            font-weight: 600;
+            font-size: 1.05rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .options-list {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .option-label:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        input[type="radio"] {
+            accent-color: var(--primary);
+            width: 1.1rem;
+            height: 1.1rem;
+            margin: 0;
+        }
+
+        /* 1-5 rating options style */
+        .rating-options {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .rating-label {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .rating-label:hover {
+            background: rgba(124, 58, 237, 0.15);
+            border-color: var(--primary);
+        }
+
+        input[type="radio"].rating-input {
+            display: none;
+        }
+
+        input[type="radio"].rating-input:checked + .rating-label {
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 12px rgba(124, 58, 237, 0.5);
+            color: #fff;
+        }
+
+        .btn-submit {
+            display: block;
+            width: 100%;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4);
+            transition: all 0.2s ease;
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6);
+        }
+
+        .results-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            border: 1px solid var(--primary);
+            border-radius: 16px;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #c084fc;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .metric-output-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .metric-output-label {
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .metric-output-val {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .btn-close {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-main);
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Vaani — Human Evaluation Form</h1>
+        <div class="subtitle">Subjective Dubbing Quality & Emotion Alignment Verification</div>
+    </header>
+
+    <div class="instructions-card">
+        <h2>Instructions for Evaluators</h2>
+        <ol>
+            <li>Listen carefully to the **Original English** clip to capture voice identity and emotional delivery.</li>
+            <li>Listen to the **Dubbed Hindi** clip generated by the Vaani pipeline.</li>
+            <li>Answer the three questions below for each clip pair based on your perception.</li>
+            <li>Once completed, click the **Compute Survey Summary** button at the bottom to calculate the scoring.</li>
+        </ol>
+    </div>
+
+    <form id="evalForm" onsubmit="calculateScores(event)">
+        <!-- Clip Pair 1 -->
+        <div class="clip-pair-card">
+            <div class="clip-header">
+                <h3 class="clip-title">Clip Pair 1 of 5</h3>
+                <span class="clip-badge">Tone: Excited / High Energy</span>
+            </div>
+            
+            <div class="audio-players">
+                <div class="audio-player-wrapper">
+                    <label class="audio-label">Original English Reference</label>
+                    <audio controls src="../../samples/excited_original.wav"></audio>
+                </div>
+                <div class="audio-player-wrapper">
+                    <label class="audio-label">Dubbed Hindi Output</label>
+                    <audio controls src="../../outputs/dubbed_hindi_excited.wav"></audio>
+                </div>
+            </div>
+
+            <div class="question-group">
+                <div class="question-text">Q1: Does the dubbed clip sound like the same speaker?</div>
+                <div class="options-list">
+                    <label class="option-label">
+                        <input type="radio" name="q1_c1" value="1.0" required> Yes, clearly
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q1_c1" value="0.5"> Somewhat
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q1_c1" value="0.0"> No, different person
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-group">
+                <div class="question-text">Q2: Does the dubbed clip preserve the emotional intensity (excitement)?</div>
+                <div class="options-list">
+                    <label class="option-label">
+                        <input type="radio" name="q2_c1" value="1.0" required> Yes, clearly
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q2_c1" value="0.5"> Somewhat
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q2_c1" value="0.0"> No, flat/different
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-group">
+                <div class="question-text">Q3: Rate the overall quality of lip sync and audio synthesis (1-5):</div>
+                <div class="rating-options">
+                    <input type="radio" id="rating1_c1" name="q3_c1" value="1" class="rating-input" required><label for="rating1_c1" class="rating-label">1</label>
+                    <input type="radio" id="rating2_c1" name="q3_c1" value="2" class="rating-input"><label for="rating2_c1" class="rating-label">2</label>
+                    <input type="radio" id="rating3_c1" name="q3_c1" value="3" class="rating-input"><label for="rating3_c1" class="rating-label">3</label>
+                    <input type="radio" id="rating4_c1" name="q3_c1" value="4" class="rating-input"><label for="rating4_c1" class="rating-label">4</label>
+                    <input type="radio" id="rating5_c1" name="q3_c1" value="5" class="rating-input"><label for="rating5_c1" class="rating-label">5</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clip Pair 2 -->
+        <div class="clip-pair-card">
+            <div class="clip-header">
+                <h3 class="clip-title">Clip Pair 2 of 5</h3>
+                <span class="clip-badge">Tone: Serious / Urgent</span>
+            </div>
+            
+            <div class="audio-players">
+                <div class="audio-player-wrapper">
+                    <label class="audio-label">Original English Reference</label>
+                    <audio controls src="../../samples/serious_original.wav"></audio>
+                </div>
+                <div class="audio-player-wrapper">
+                    <label class="audio-label">Dubbed Hindi Output</label>
+                    <audio controls src="../../outputs/dubbed_hindi_serious.wav"></audio>
+                </div>
+            </div>
+
+            <div class="question-group">
+                <div class="question-text">Q1: Does the dubbed clip sound like the same speaker?</div>
+                <div class="options-list">
+                    <label class="option-label">
+                        <input type="radio" name="q1_c2" value="1.0" required> Yes, clearly
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q1_c2" value="0.5"> Somewhat
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q1_c2" value="0.0"> No, different person
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-group">
+                <div class="question-text">Q2: Does the dubbed clip preserve the emotional intensity (seriousness)?</div>
+                <div class="options-list">
+                    <label class="option-label">
+                        <input type="radio" name="q2_c2" value="1.0" required> Yes, clearly
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q2_c2" value="0.5"> Somewhat
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q2_c2" value="0.0"> No, flat/different
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-group">
+                <div class="question-text">Q3: Rate the overall quality of lip sync and audio synthesis (1-5):</div>
+                <div class="rating-options">
+                    <input type="radio" id="rating1_c2" name="q3_c2" value="1" class="rating-input" required><label for="rating1_c2" class="rating-label">1</label>
+                    <input type="radio" id="rating2_c2" name="q3_c2" value="2" class="rating-input"><label for="rating2_c2" class="rating-label">2</label>
+                    <input type="radio" id="rating3_c2" name="q3_c2" value="3" class="rating-input"><label for="rating3_c2" class="rating-label">3</label>
+                    <input type="radio" id="rating4_c2" name="q3_c2" value="4" class="rating-input"><label for="rating4_c2" class="rating-label">4</label>
+                    <input type="radio" id="rating5_c2" name="q3_c2" value="5" class="rating-input"><label for="rating5_c2" class="rating-label">5</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clip Pair 3 -->
+        <div class="clip-pair-card">
+            <div class="clip-header">
+                <h3 class="clip-title">Clip Pair 3 of 5</h3>
+                <span class="clip-badge">Tone: Calm / Informational</span>
+            </div>
+            
+            <div class="audio-players">
+                <div class="audio-player-wrapper">
+                    <label class="audio-label">Original English Reference</label>
+                    <audio controls src="../../samples/calm_original.wav"></audio>
+                </div>
+                <div class="audio-player-wrapper">
+                    <label class="audio-label">Dubbed Hindi Output</label>
+                    <audio controls src="../../outputs/dubbed_hindi_calm.wav"></audio>
+                </div>
+            </div>
+
+            <div class="question-group">
+                <div class="question-text">Q1: Does the dubbed clip sound like the same speaker?</div>
+                <div class="options-list">
+                    <label class="option-label">
+                        <input type="radio" name="q1_c3" value="1.0" required> Yes, clearly
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q1_c3" value="0.5"> Somewhat
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q1_c3" value="0.0"> No, different person
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-group">
+                <div class="question-text">Q2: Does the dubbed clip preserve the emotional intensity (calmness)?</div>
+                <div class="options-list">
+                    <label class="option-label">
+                        <input type="radio" name="q2_c3" value="1.0" required> Yes, clearly
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q2_c3" value="0.5"> Somewhat
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q2_c3" value="0.0"> No, flat/different
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-group">
+                <div class="question-text">Q3: Rate the overall quality of lip sync and audio synthesis (1-5):</div>
+                <div class="rating-options">
+                    <input type="radio" id="rating1_c3" name="q3_c3" value="1" class="rating-input" required><label for="rating1_c3" class="rating-label">1</label>
+                    <input type="radio" id="rating2_c3" name="q3_c3" value="2" class="rating-input"><label for="rating2_c3" class="rating-label">2</label>
+                    <input type="radio" id="rating3_c3" name="q3_c3" value="3" class="rating-input"><label for="rating3_c3" class="rating-label">3</label>
+                    <input type="radio" id="rating4_c3" name="q3_c3" value="4" class="rating-input"><label for="rating4_c3" class="rating-label">4</label>
+                    <input type="radio" id="rating5_c3" name="q3_c3" value="5" class="rating-input"><label for="rating5_c3" class="rating-label">5</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clip Pair 4 -->
+        <div class="clip-pair-card">
+            <div class="clip-header">
+                <h3 class="clip-title">Clip Pair 4 of 5</h3>
+                <span class="clip-badge">Tone: Neutral / Narrator</span>
+            </div>
+            
+            <div class="audio-players">
+                <div class="audio-player-wrapper">
+                    <label class="audio-label">Original English Reference</label>
+                    <audio controls src="../../samples/neutral_original.wav"></audio>
+                </div>
+                <div class="audio-player-wrapper">
+                    <label class="audio-label">Dubbed Hindi Output</label>
+                    <audio controls src="../../outputs/dubbed_hindi_neutral.wav"></audio>
+                </div>
+            </div>
+
+            <div class="question-group">
+                <div class="question-text">Q1: Does the dubbed clip sound like the same speaker?</div>
+                <div class="options-list">
+                    <label class="option-label">
+                        <input type="radio" name="q1_c4" value="1.0" required> Yes, clearly
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q1_c4" value="0.5"> Somewhat
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q1_c4" value="0.0"> No, different person
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-group">
+                <div class="question-text">Q2: Does the dubbed clip preserve the emotional intensity (neutral)?</div>
+                <div class="options-list">
+                    <label class="option-label">
+                        <input type="radio" name="q2_c4" value="1.0" required> Yes, clearly
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q2_c4" value="0.5"> Somewhat
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q2_c4" value="0.0"> No, flat/different
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-group">
+                <div class="question-text">Q3: Rate the overall quality of lip sync and audio synthesis (1-5):</div>
+                <div class="rating-options">
+                    <input type="radio" id="rating1_c4" name="q3_c4" value="1" class="rating-input" required><label for="rating1_c4" class="rating-label">1</label>
+                    <input type="radio" id="rating2_c4" name="q3_c4" value="2" class="rating-input"><label for="rating2_c4" class="rating-label">2</label>
+                    <input type="radio" id="rating3_c4" name="q3_c4" value="3" class="rating-input"><label for="rating3_c4" class="rating-label">3</label>
+                    <input type="radio" id="rating4_c4" name="q3_c4" value="4" class="rating-input"><label for="rating4_c4" class="rating-label">4</label>
+                    <input type="radio" id="rating5_c4" name="q3_c4" value="5" class="rating-input"><label for="rating5_c4" class="rating-label">5</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clip Pair 5 -->
+        <div class="clip-pair-card">
+            <div class="clip-header">
+                <h3 class="clip-title">Clip Pair 5 of 5</h3>
+                <span class="clip-badge">Tone: Sad / Soft Speaking</span>
+            </div>
+            
+            <div class="audio-players">
+                <div class="audio-player-wrapper">
+                    <label class="audio-label">Original English Reference</label>
+                    <audio controls src="../../samples/sad_original.wav"></audio>
+                </div>
+                <div class="audio-player-wrapper">
+                    <label class="audio-label">Dubbed Hindi Output</label>
+                    <audio controls src="../../outputs/dubbed_hindi_sad.wav"></audio>
+                </div>
+            </div>
+
+            <div class="question-group">
+                <div class="question-text">Q1: Does the dubbed clip sound like the same speaker?</div>
+                <div class="options-list">
+                    <label class="option-label">
+                        <input type="radio" name="q1_c5" value="1.0" required> Yes, clearly
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q1_c5" value="0.5"> Somewhat
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q1_c5" value="0.0"> No, different person
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-group">
+                <div class="question-text">Q2: Does the dubbed clip preserve the emotional intensity (sadness)?</div>
+                <div class="options-list">
+                    <label class="option-label">
+                        <input type="radio" name="q2_c5" value="1.0" required> Yes, clearly
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q2_c5" value="0.5"> Somewhat
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q2_c5" value="0.0"> No, flat/different
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-group">
+                <div class="question-text">Q3: Rate the overall quality of lip sync and audio synthesis (1-5):</div>
+                <div class="rating-options">
+                    <input type="radio" id="rating1_c5" name="q3_c5" value="1" class="rating-input" required><label for="rating1_c5" class="rating-label">1</label>
+                    <input type="radio" id="rating2_c5" name="q3_c5" value="2" class="rating-input"><label for="rating2_c5" class="rating-label">2</label>
+                    <input type="radio" id="rating3_c5" name="q3_c5" value="3" class="rating-input"><label for="rating3_c5" class="rating-label">3</label>
+                    <input type="radio" id="rating4_c5" name="q3_c5" value="4" class="rating-input"><label for="rating4_c5" class="rating-label">4</label>
+                    <input type="radio" id="rating5_c5" name="q3_c5" value="5" class="rating-input"><label for="rating5_c5" class="rating-label">5</label>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit">🚀 Compute Survey Summary</button>
+    </form>
+</div>
+
+<!-- Output Modal -->
+<div class="results-modal" id="resultsModal">
+    <div class="modal-content">
+        <h3 class="modal-title">📊 Evaluator Report Summary</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+            Copy these numbers to your main survey tracking sheet.
+        </p>
+        
+        <div class="metric-output-group">
+            <span class="metric-output-label">Voice-Cloning Match Rate:</span>
+            <span class="metric-output-val" id="resVoiceMatch">0%</span>
+        </div>
+        <div class="metric-output-group">
+            <span class="metric-output-label">Emotion Preservation Rate:</span>
+            <span class="metric-output-val" id="resEmotionPres">0%</span>
+        </div>
+        <div class="metric-output-group">
+            <span class="metric-output-label">Mean Overall Quality Score:</span>
+            <span class="metric-output-val" id="resMeanQuality">0.0 / 5.0</span>
+        </div>
+
+        <button class="btn-close" onclick="closeModal()">Close Form</button>
+    </div>
+</div>
+
+<script>
+    function calculateScores(event) {
+        event.preventDefault();
+
+        // 1. Voice Matching Scores
+        let voiceScore = 0;
+        voiceScore += parseFloat(document.querySelector('input[name="q1_c1"]:checked').value);
+        voiceScore += parseFloat(document.querySelector('input[name="q1_c2"]:checked').value);
+        voiceScore += parseFloat(document.querySelector('input[name="q1_c3"]:checked').value);
+        voiceScore += parseFloat(document.querySelector('input[name="q1_c4"]:checked').value);
+        voiceScore += parseFloat(document.querySelector('input[name="q1_c5"]:checked').value);
+        let voicePct = (voiceScore / 5.0) * 100;
+
+        // 2. Emotion Preservation Scores
+        let emoScore = 0;
+        emoScore += parseFloat(document.querySelector('input[name="q2_c1"]:checked').value);
+        emoScore += parseFloat(document.querySelector('input[name="q2_c2"]:checked').value);
+        emoScore += parseFloat(document.querySelector('input[name="q2_c3"]:checked').value);
+        emoScore += parseFloat(document.querySelector('input[name="q2_c4"]:checked').value);
+        emoScore += parseFloat(document.querySelector('input[name="q2_c5"]:checked').value);
+        let emoPct = (emoScore / 5.0) * 100;
+
+        // 3. Mean Quality Rating
+        let totalQuality = 0;
+        totalQuality += parseInt(document.querySelector('input[name="q3_c1"]:checked').value);
+        totalQuality += parseInt(document.querySelector('input[name="q3_c2"]:checked').value);
+        totalQuality += parseInt(document.querySelector('input[name="q3_c3"]:checked').value);
+        totalQuality += parseInt(document.querySelector('input[name="q3_c4"]:checked').value);
+        totalQuality += parseInt(document.querySelector('input[name="q3_c5"]:checked').value);
+        let meanQuality = totalQuality / 5.0;
+
+        // Set text output
+        document.getElementById('resVoiceMatch').innerText = voicePct.toFixed(1) + "%";
+        document.getElementById('resEmotionPres').innerText = emoPct.toFixed(1) + "%";
+        document.getElementById('resMeanQuality').innerText = meanQuality.toFixed(2) + " / 5.0";
+
+        // Show Modal
+        document.getElementById('resultsModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('resultsModal').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>

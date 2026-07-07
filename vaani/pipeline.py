@@ -154,6 +154,7 @@ def dub_video(
     model_name_translation: Optional[str] = None,
     model_name_xtts: Optional[str] = None,
     voice_reference_path: Optional[str] = None,
+    progress_cb=None,
 ) -> str:
     """
     Translate and dub a video of a person speaking English to a target language (default Hindi)
@@ -208,6 +209,8 @@ def dub_video(
     cloned_audio_raw_path = ckpt_dir / f"cloned_audio_raw{suffix}.wav"
     cloned_audio_synced_path = ckpt_dir / f"cloned_audio_synced{suffix}.wav"
     final_video_temp_path = ckpt_dir / f"dubbed_video_temp{suffix}.mp4"
+    if progress_cb:
+        progress_cb(0.0, "Stage 1/6: Extracting audio...")
 
     # --- STAGE 1: Audio Extraction ---
     t0 = time.perf_counter()
@@ -219,6 +222,9 @@ def dub_video(
         except Exception as exc:
             raise AudioExtractionError(f"Audio extraction stage failed: {exc}") from exc
     timings["Audio Extraction"] = time.perf_counter() - t0
+
+    if progress_cb:
+        progress_cb(0.15, "Stage 2/6: Transcribing speech (Whisper)...")
 
     # --- STAGE 2: Speech-to-Text (ASR) ---
     t0 = time.perf_counter()
@@ -243,6 +249,9 @@ def dub_video(
             raise TranscriptionError(f"ASR stage failed: {exc}") from exc
     timings["ASR (Whisper)"] = time.perf_counter() - t0
 
+    if progress_cb:
+        progress_cb(0.35, "Stage 3/6: Translating to Hindi (IndicTrans2)...")
+
     # --- STAGE 3: Translation ---
     t0 = time.perf_counter()
     if translated_text_path.is_file():
@@ -264,6 +273,9 @@ def dub_video(
         except Exception as exc:
             raise TranslationError(f"Translation stage failed: {exc}") from exc
     timings["Translation"] = time.perf_counter() - t0
+
+    if progress_cb:
+        progress_cb(0.55, "Stage 4/6: Cloning voice with emotion (XTTS-v2)...")
 
     # --- STAGE 4: Voice Cloning (multilingual TTS) ---
     t0 = time.perf_counter()
@@ -288,6 +300,9 @@ def dub_video(
         except Exception as exc:
             raise VoiceCloningError(f"Voice cloning stage failed: {exc}") from exc
     timings["Voice Cloning (XTTS)"] = time.perf_counter() - t0
+
+    if progress_cb:
+        progress_cb(0.75, "Stage 5/6: Audio synchronization...")
 
     # --- STAGE 5: Audio Synchronization (Duration Match) ---
     t0 = time.perf_counter()
@@ -325,6 +340,9 @@ def dub_video(
         except Exception as exc:
             raise VaaniError(f"Audio synchronization stage failed: {exc}") from exc
     timings["Synchronization"] = time.perf_counter() - t0
+
+    if progress_cb:
+        progress_cb(0.85, "Stage 6/6: Re-syncing lips (Wav2Lip)...")
 
     # --- STAGE 6: Lip-Sync (Wav2Lip) ---
     t0 = time.perf_counter()

@@ -317,6 +317,13 @@ These are named limitations — not hidden. Naming them is how this project is c
 
 ---
 
+## Internship Weekly Updates
+
+Progress and updates for the internship can be found here:  
+🔗 **[Internship Weekly Updates (Google Drive)](https://drive.google.com/drive/folders/1zLiaPra8GOAy7co4oJWxaJszx3WEfFSo?usp=drive_link)**
+
+---
+
 ## Author
 
 **Sakshi Verma** — Internship portfolio project, 2026  
