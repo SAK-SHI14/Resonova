@@ -29,6 +29,44 @@ import torch
 
 logger = logging.getLogger(__name__)
 
+# ─── Programmatic Setup for HuggingFace Spaces ────────────────────────────────
+# Clone and install sub-repositories if we are running in the Spaces environment.
+if os.environ.get("SPACES_AUTHOR_NAME") or "spaces" in os.environ.get("PATH", "").lower() or os.path.exists("/home/user/app"):
+    import subprocess
+    import sys
+    import urllib.request
+
+    # 1. Clone & Install IndicTrans2 if missing
+    if not os.path.exists("IndicTrans2"):
+        logger.info("HF Space Startup: Cloning IndicTrans2...")
+        subprocess.run(["git", "clone", "https://github.com/AI4Bharat/IndicTrans2.git"])
+        logger.info("HF Space Startup: Installing IndicTrans2/IndicTransToolkit...")
+        subprocess.run([sys.executable, "-m", "pip", "install", "-e", "IndicTrans2/"])
+
+    # 2. Clone Wav2Lip if missing
+    if not os.path.exists("Wav2Lip"):
+        logger.info("HF Space Startup: Cloning Wav2Lip...")
+        subprocess.run(["git", "clone", "https://github.com/Rudrabha/Wav2Lip.git"])
+
+    # 3. Download Wav2Lip GAN checkpoint if missing
+    ckpt_dir = "Wav2Lip/checkpoints"
+    os.makedirs(ckpt_dir, exist_ok=True)
+    ckpt_path = os.path.join(ckpt_dir, "wav2lip_gan.pth")
+    if not os.path.exists(ckpt_path):
+        logger.info("HF Space Startup: Downloading Wav2Lip checkpoint...")
+        urllib.request.urlretrieve(
+            "https://huggingface.co/yzd-v/Wav2Lip/resolve/main/wav2lip_gan.pth",
+            ckpt_path
+        )
+
+    # 4. Set environmental variables and sys.path
+    os.environ["WAV2LIP_REPO_PATH"] = os.path.abspath("Wav2Lip")
+    os.environ["WAV2LIP_CHECKPOINT_PATH"] = os.path.abspath(ckpt_path)
+    
+    sys.path.append(os.path.abspath("IndicTrans2"))
+    sys.path.append(os.path.abspath("Wav2Lip"))
+    logger.info("HF Space Startup: Setup completed successfully.")
+
 # ─── Try to import spaces; graceful fallback for local testing ────────────────
 try:
     import spaces  # noqa: F401 — only available inside HuggingFace Spaces runtime
