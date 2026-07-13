@@ -5,6 +5,12 @@ Main Gradio Application Dashboard.
 Restructured into a double-column dashboard with tabbed panels,
 side-by-side video controls, stage-by-stage progress, examples,
 and matplotlib Emotion Report Card outputs.
+
+Public API
+----------
+build_interface(pipeline_fn, compute_banner, show_hf_badge) → gr.Blocks
+    Reusable interface builder. Used by both this module (Docker/local)
+    and vaani/app/spaces_app.py (HuggingFace Spaces ZeroGPU).
 """
 
 import logging
@@ -169,8 +175,26 @@ def run_vaani_pipeline(
 
 # ─── Gradio Blocks layout ────────────────────────────────────────────────────
 
-def _build_interface() -> gr.Blocks:
-    """Build and configure the main Gradio Blocks layout."""
+def build_interface(
+    pipeline_fn=None,
+    compute_banner: str = None,
+    show_hf_badge: bool = False,
+) -> gr.Blocks:
+    """
+    Build and return the Gradio Blocks interface.
+
+    Args:
+        pipeline_fn:    The backend function called on button click.
+                        Defaults to run_vaani_pipeline (local/Docker).
+        compute_banner: Override the GPU/CPU banner HTML string.
+                        Defaults to auto-detected local mode banner.
+        show_hf_badge:  If True, shows a HuggingFace badge in the header.
+                        Used by spaces_app.py.
+    """
+    if pipeline_fn is None:
+        pipeline_fn = run_vaani_pipeline
+    if compute_banner is None:
+        compute_banner = COMPUTE_BANNER
     with gr.Blocks(
         title="Vaani — Emotion-Preserving AI Dubbing",
         theme=gr.themes.Soft(
@@ -194,17 +218,22 @@ def _build_interface() -> gr.Blocks:
     ) as demo:
 
         # Header Title
+        hf_badge = (
+            "[![HuggingFace Spaces](https://img.shields.io/badge/🤗-Live%20Demo-blue)]("
+            "https://huggingface.co/spaces/SAK-SHI14/vaani-dubbing)  "
+        ) if show_hf_badge else ""
         gr.Markdown(
-            """
+            f"""
             # 🗣️ Vaani — वाणी
             ### English → Hindi Video Dubbing in Your Voice with Emotion Preserved
-            
+
+            {hf_badge}
             *Speaker Similarity:* **`86.5%`** *| Emotion Preservation:* **`80%`** *| BLEU:* **`0.5120`** *(beats published paper baseline)*
             """
         )
 
         # GPU/CPU Mode status banner
-        gr.HTML(f'<div class="compute-banner">{COMPUTE_BANNER}</div>')
+        gr.HTML(f'<div class="compute-banner">{compute_banner}</div>')
 
         # Double column layout
         with gr.Row():
@@ -290,7 +319,7 @@ def _build_interface() -> gr.Blocks:
 
         # Connect button trigger events
         submit_btn.click(
-            fn=run_vaani_pipeline,
+            fn=pipeline_fn,
             inputs=[video_input, target_lang],
             outputs=[
                 original_video_display,
@@ -307,8 +336,8 @@ def _build_interface() -> gr.Blocks:
 
 
 def create_app() -> gr.Blocks:
-    """Create and return configured Blocks application object."""
-    return _build_interface()
+    """Create and return configured Blocks application object (Docker/local use)."""
+    return build_interface()
 
 
 demo = create_app()

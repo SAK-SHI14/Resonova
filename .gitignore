@@ -8,8 +8,14 @@
 *.safetensors
 checkpoints/
 
-# ─── Your Personal Source Clips (never commit these) ───
-samples/
+# ─── Source clips — NEVER commit personal/source footage ───
+# Allow only curated example dubbed outputs for HuggingFace Spaces
+samples/*_source.*
+samples/*_original.*
+samples/*_raw.*
+# Commit only the example dubbed outputs:
+!samples/example_*.mp4
+!samples/.gitkeep
 outputs/
 
 # ─── Environment files ───

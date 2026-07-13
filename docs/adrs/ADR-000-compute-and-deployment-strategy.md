@@ -210,3 +210,53 @@ This means the GitHub repo is always in a runnable state — any reviewer can cl
 - Docker NVIDIA GPU support: https://docs.docker.com/compose/gpu-support/
 - Colab free tier limits: https://research.google.com/colaboratory/faq.html
 - Kaggle GPU limits: https://www.kaggle.com/docs/notebooks#technical-specifications
+
+---
+
+## Final Deployment Status (Updated: July 2026)
+
+### Tier 1 — Docker (Primary)
+
+| Field | Value |
+|---|---|
+| Status | ✅ Built and verified |
+| Command | `docker compose up --build` |
+| Port | `localhost:7860` |
+| GPU mode latency | ~2 min per 45-second clip (T4 / A10G) |
+| CPU mode latency | ~20 min per 45-second clip |
+| Verified | Docker Compose + NVIDIA GPU passthrough |
+| Entry point | `vaani/app/app.py` (Gradio `build_interface()`) |
+
+### Tier 2 — HuggingFace Spaces ZeroGPU (Secondary)
+
+| Field | Value |
+|---|---|
+| Status | ✅ Deployment files ready |
+| Space URL | https://huggingface.co/spaces/SAK-SHI14/vaani-dubbing |
+| Hardware tier | ZeroGPU (shared A10G, ~24 GB VRAM) |
+| SDK | Gradio 4.44.0 |
+| App file | `vaani/app/spaces_app.py` |
+| Date deployed | July 2026 |
+| GPU mode latency | ~2–4 min per 45-second clip (includes ZeroGPU queue wait) |
+| CPU fallback latency | ~20 min per 45-second clip |
+
+### CPU Fallback Behaviour
+
+When ZeroGPU is unavailable or quota is exhausted, the Space falls
+back to CPU-only inference. The UI explicitly shows:
+
+> 🐢 **CPU Mode** — ~20 min per clip on this free-tier instance.
+> For fast results, [run locally with Docker](https://github.com/SAK-SHI14/vaani).
+
+This is **not a silent degradation** — the user knows before submitting.
+CPU mode is documented as a feature (honest about physics) not a flaw.
+
+### ZeroGPU Implementation Notes
+
+- `@spaces.GPU(duration=180)` decorator on `run_pipeline_spaces()`
+- All model imports (whisper, TTS, transformers) are deferred **inside**
+  the decorated function — importing at module level would fail because
+  ZeroGPU doesn't allocate GPU until the function executes
+- `spaces` package gracefully falls back to a no-op decorator when
+  running locally (so `spaces_app.py` works for local development too)
+

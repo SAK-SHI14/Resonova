@@ -1,0 +1,64 @@
+# ============================================================
+# Vaani — HuggingFace Spaces Runtime Requirements
+# ============================================================
+# Lighter than requirements.txt:
+#   - No dev/testing packages
+#   - No Wav2Lip-specific pinned versions (Wav2Lip runs as subprocess;
+#     these are the versions needed for the Spaces Python env only)
+#   - Uses newer torch to match ZeroGPU A10G (CUDA 12.x)
+#
+# System deps (installed via packages.txt):
+#   ffmpeg, libsndfile1
+# ============================================================
+
+# ----- Gradio + Spaces -----
+gradio>=4.44.0
+spaces
+
+# ----- ASR -----
+openai-whisper
+
+# ----- Translation -----
+transformers>=4.35.0
+sentencepiece>=0.1.99
+sacremoses>=0.0.53
+indic-nlp-library>=0.91
+# IndicTrans2 must be installed from source during Space build:
+# git clone https://github.com/AI4Bharat/IndicTrans2 && pip install -e IndicTrans2/
+
+# ----- Voice Cloning -----
+TTS>=0.22.0
+
+# ----- Prosody / Audio -----
+librosa>=0.10.0
+soundfile>=0.12.0
+pydub>=0.25.1
+ffmpeg-python>=0.2.0
+
+# ----- Evaluation -----
+resemblyzer>=0.1.3
+sacrebleu>=2.3.1
+
+# ----- Visualization -----
+matplotlib>=3.7.0
+Pillow>=9.5.0
+
+# ----- Core numerical -----
+numpy<2.0
+scipy>=1.10.0
+
+# ----- PyTorch (ZeroGPU A10G = CUDA 12.x) -----
+# HuggingFace Spaces pre-installs torch with CUDA; uncomment only if needed:
+# torch>=2.0.0
+# torchaudio>=2.0.0
+
+# ----- Wav2Lip subprocess dependencies -----
+# Wav2Lip is run via subprocess (not imported directly).
+# The following are needed for face detection inside the subprocess:
+face-alignment==1.3.5
+opencv-python==4.5.5.64
+
+# ----- Misc -----
+python-dotenv>=1.0.0
+tqdm>=4.66.0
+requests>=2.31.0
