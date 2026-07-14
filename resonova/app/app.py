@@ -198,20 +198,59 @@ def build_interface(
     with gr.Blocks(
         title="Resonova — Emotion-Preserving AI Dubbing",
         theme=gr.themes.Soft(
-            primary_hue="violet",
-            secondary_hue="indigo",
+            primary_hue="orange",
+            secondary_hue="orange",
             neutral_hue="slate",
         ),
         css="""
-            .gradio-container { max-width: 960px; margin: auto; }
+            body, .gradio-container {
+                background-color: #f8edeb !important;
+                color: #2d3748 !important;
+                font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif !important;
+            }
+            .gradio-container {
+                max-width: 960px;
+                margin: auto;
+            }
             .compute-banner {
-                background: #1e293b;
-                border: 1px solid #7c3aed;
-                border-radius: 8px;
+                background: #ffe5d9 !important;
+                border: 1px solid #fec89a !important;
+                border-radius: 12px;
                 padding: 12px 16px;
-                font-size: 0.9em;
+                font-size: 0.95em;
                 margin-bottom: 20px;
-                color: #f8fafc;
+                color: #2d3748 !important;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            }
+            #submit_button, button.primary {
+                background-color: #fec89a !important;
+                color: #2d3748 !important;
+                border: 1px solid #ffd7ba !important;
+                border-radius: 8px !important;
+                font-weight: 600 !important;
+                transition: all 0.2s ease-in-out !important;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            }
+            #submit_button:hover, button.primary:hover {
+                background-color: #ffd7ba !important;
+                transform: translateY(-1px);
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            }
+            h1, h2, h3 {
+                color: #2d3748 !important;
+            }
+            .block {
+                border-color: #ece4db !important;
+                border-radius: 12px !important;
+                background-color: #ffffff !important;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            }
+            .tabs {
+                border-bottom: 2px solid #ece4db !important;
+            }
+            .tab-nav button.selected {
+                border-bottom-color: #fec89a !important;
+                color: #2d3748 !important;
             }
             footer { display: none !important; }
         """,
@@ -224,7 +263,7 @@ def build_interface(
         ) if show_hf_badge else ""
         gr.Markdown(
             f"""
-            # 🗣️ Resonova — वाणी
+            # 🗣️ Resonova
             ### English → Hindi Video Dubbing in Your Voice with Emotion Preserved
 
             {hf_badge}
