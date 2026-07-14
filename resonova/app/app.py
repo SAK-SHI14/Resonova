@@ -213,7 +213,8 @@ def build_interface(
                 font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif !important;
             }
             .gradio-container {
-                max-width: 960px;
+                max-width: 1600px !important;
+                width: 95% !important;
                 margin: auto;
             }
             .compute-banner {
