@@ -1,8 +1,8 @@
-# Project Vaani — Phase 5 Evaluation & Benchmark Report
+# Project Resonova — Phase 5 Evaluation & Benchmark Report
 
 **Status:** Final | **Date:** July 2026 | **Author:** Sakshi Verma
 
-This document reports the performance metrics of the **Vaani** emotion-preserving
+This document reports the performance metrics of the **Resonova** emotion-preserving
 AI dubbing pipeline. Results are calculated using standard speech datasets
 (RAVDESS, FLORES-200) alongside our own test clips.
 
@@ -36,7 +36,7 @@ from dominating the results.
 **Protocol:**
 1. For each source clip: classify the emotion of the **original English WAV** using
    RAVDESS filename decoding (ground-truth label from the dataset itself).
-2. Run the audio through Vaani's dubbing pipeline (ASR → translate → clone_voice
+2. Run the audio through Resonova's dubbing pipeline (ASR → translate → clone_voice
    → prosody conditioning) to produce a Hindi dubbed WAV.
 3. Classify the emotion of the **dubbed Hindi WAV** using the same SER pipeline
    (HuggingFace `xlsr-wav2vec2-speech-emotion-recognition`).
@@ -53,7 +53,7 @@ meaningful result than the absolute 80% figure.
 **Dataset:** FLORES-200 devtest split — curated, professionally translated English-Hindi
 sentence pairs used to benchmark MT systems.
 
-**Protocol:** Evaluate **100 English→Hindi translation pairs** with Vaani's
+**Protocol:** Evaluate **100 English→Hindi translation pairs** with Resonova's
 IndicTrans2-1B translation module. Compute corpus-level BLEU (using `sacrebleu`)
 and sentence-level chrF averaged over the 100 pairs.
 
@@ -87,7 +87,7 @@ Range: 0.82 – 0.91 across clips.
 - **Condition A (OFF):** Run clone_voice with a 10-second silent reference audio
   (neutral, no speaker style transferred)
 - **Condition B (ON):** Run clone_voice with the original speaker's audio as
-  `speaker_wav` reference (Vaani's actual approach)
+  `speaker_wav` reference (Resonova's actual approach)
 
 **Metric:** SER agreement rate (does the dubbed audio's SER label match the original?).
 
@@ -109,7 +109,7 @@ Range: 0.82 – 0.91 across clips.
 
 ### 2. Ablation Study: Style Conditioning ON vs. OFF
 
-| Evaluated Parameter | Conditioning ON (Vaani) | Conditioning OFF (Baseline) | Δ Improvement |
+| Evaluated Parameter | Conditioning ON (Resonova) | Conditioning OFF (Baseline) | Δ Improvement |
 |--------------------|-----------------------|---------------------------|--------------|
 | **Speaker Similarity** | 0.8650 | 0.8420 | +0.0230 |
 | **Emotion Agreement (Pearson F0)** | 0.7240 | 0.5180 | +0.2060 |
@@ -132,7 +132,7 @@ fidelity of the dubbed output versus a flat, neutral baseline.
 
 ### 4. Translation Sample Outputs (FLORES-200)
 
-| English (Source) | Hindi (Vaani Output) | Hindi (Reference) |
+| English (Source) | Hindi (Resonova Output) | Hindi (Reference) |
 |-----------------|---------------------|------------------|
 | "The cat sat on the mat." | "बिल्ली चटाई पर बैठी।" | "बिल्ली चटाई पर बैठी थी।" |
 | "She was running to catch the train." | "वह ट्रेन पकड़ने के लिए दौड़ रही थी।" | "वह ट्रेन पकड़ने के लिए दौड़ रही थी।" |
@@ -189,7 +189,7 @@ next step for a production-grade assessment.
 
 ## 🎓 Conclusion
 
-The benchmark evaluation confirms that Vaani successfully maintains speaker identity
+The benchmark evaluation confirms that Resonova successfully maintains speaker identity
 and emotional delivery during English→Hindi video dubbing. The ablation study
 (+40pp SER improvement, conditioning ON vs. OFF) is the clearest evidence that the
 prosody conditioning layer works.

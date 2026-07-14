@@ -3,7 +3,7 @@
 **Status:** Accepted  
 **Date:** Week 3, Phase 3  
 **Authors:** Sakshi Verma  
-**Context:** Project Vaani — emotion-preserving dubbing pipeline (English → Hindi)
+**Context:** Project Resonova — emotion-preserving dubbing pipeline (English → Hindi)
 
 ---
 
@@ -11,7 +11,7 @@
 
 Most modern speech-to-speech dubbing pipelines sound flat and robotic. They convert text to speech using generic speaker profiles that lack the emotional cadence (inflections, rate of speech, emphasis, and pauses) of the original speaker in the source video. 
 
-Vaani must preserve this emotional color to make dubbing feel natural and engaging. We evaluated two primary methods to capture and apply emotional prosody to the synthesized Hindi speech.
+Resonova must preserve this emotional color to make dubbing feel natural and engaging. We evaluated two primary methods to capture and apply emotional prosody to the synthesized Hindi speech.
 
 ---
 

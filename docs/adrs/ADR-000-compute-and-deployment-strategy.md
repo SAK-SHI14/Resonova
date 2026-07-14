@@ -2,13 +2,13 @@
 **Status:** Accepted  
 **Date:** Phase 0 — Environment Sprint  
 **Authors:** Sakshi Verma  
-**Context:** Project Vaani — emotion-preserving dubbing pipeline (English → Hindi)
+**Context:** Project Resonova — emotion-preserving dubbing pipeline (English → Hindi)
 
 ---
 
 ## Context
 
-Vaani is a GPU-heavy inference pipeline. It requires:
+Resonova is a GPU-heavy inference pipeline. It requires:
 - NVIDIA GPU with CUDA support for all model inference (Whisper, IndicTrans2, XTTS-v2, Wav2Lip)
 - Persistent storage for model weights and intermediate outputs
 - A reproducible, publicly demonstrable deployment for portfolio evaluation
@@ -46,7 +46,7 @@ Colab and Kaggle sessions are **temporary**:
 1. All code lives in **GitHub** — pull at session start, push at session end
 2. All intermediate outputs (transcripts, cloned audio, dubbed video, eval results, fine-tuned weights if any) are checkpointed to **Google Drive** immediately after each pipeline stage
 3. Every notebook cell that produces output includes a Drive checkpoint log statement
-4. The session-start template notebook (`notebooks/vaani_colab_template.ipynb`) restores the full environment in ~5 minutes
+4. The session-start template notebook (`notebooks/resonova_colab_template.ipynb`) restores the full environment in ~5 minutes
 
 ### GPU Memory Budget (T4 = ~15 GB VRAM)
 
@@ -144,7 +144,7 @@ All code lives in GitHub. Neither Colab, Kaggle, nor the Docker container is the
 
 ```
 Session start: git pull (Colab/Kaggle)
-Work in session: code changes in /content/vaani
+Work in session: code changes in /content/resonova
 Session end: git push (code) + Drive checkpoint (outputs)
 ```
 
@@ -225,17 +225,17 @@ This means the GitHub repo is always in a runnable state — any reviewer can cl
 | GPU mode latency | ~2 min per 45-second clip (T4 / A10G) |
 | CPU mode latency | ~20 min per 45-second clip |
 | Verified | Docker Compose + NVIDIA GPU passthrough |
-| Entry point | `vaani/app/app.py` (Gradio `build_interface()`) |
+| Entry point | `resonova/app/app.py` (Gradio `build_interface()`) |
 
 ### Tier 2 — HuggingFace Spaces ZeroGPU (Secondary)
 
 | Field | Value |
 |---|---|
 | Status | ✅ Deployment files ready |
-| Space URL | https://huggingface.co/spaces/SAK-SHI14/vaani-dubbing |
+| Space URL | https://huggingface.co/spaces/SAK-SHI14/resonova-dubbing |
 | Hardware tier | ZeroGPU (shared A10G, ~24 GB VRAM) |
 | SDK | Gradio 4.44.0 |
-| App file | `vaani/app/spaces_app.py` |
+| App file | `resonova/app/spaces_app.py` |
 | Date deployed | July 2026 |
 | GPU mode latency | ~2–4 min per 45-second clip (includes ZeroGPU queue wait) |
 | CPU fallback latency | ~20 min per 45-second clip |
@@ -246,7 +246,7 @@ When ZeroGPU is unavailable or quota is exhausted, the Space falls
 back to CPU-only inference. The UI explicitly shows:
 
 > 🐢 **CPU Mode** — ~20 min per clip on this free-tier instance.
-> For fast results, [run locally with Docker](https://github.com/SAK-SHI14/vaani).
+> For fast results, [run locally with Docker](https://github.com/SAK-SHI14/resonova).
 
 This is **not a silent degradation** — the user knows before submitting.
 CPU mode is documented as a feature (honest about physics) not a flaw.

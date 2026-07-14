@@ -1,5 +1,5 @@
 """
-Unit tests for vaani.pipeline.dub_video
+Unit tests for resonova.pipeline.dub_video
 ========================================
 Run with: pytest tests/test_pipeline.py -v
 """
@@ -11,15 +11,15 @@ from unittest.mock import MagicMock, patch, call
 
 import pytest
 
-from vaani.exceptions import (
+from resonova.exceptions import (
     AudioExtractionError,
-    VaaniError,
+    ResonovaError,
     LipSyncError,
     TranscriptionError,
     TranslationError,
     VoiceCloningError,
 )
-from vaani.pipeline import dub_video, get_video_duration, time_stretch_audio
+from resonova.pipeline import dub_video, get_video_duration, time_stretch_audio
 
 
 @pytest.fixture
@@ -32,15 +32,15 @@ def dummy_video(tmp_path: Path) -> Path:
 @pytest.fixture
 def mock_subcomponents():
     """Mock all model-related functions in the pipeline to prevent real loading/running."""
-    with patch("vaani.pipeline.transcribe") as mock_transcribe, \
-         patch("vaani.pipeline.translate") as mock_translate, \
-         patch("vaani.pipeline.clone_voice") as mock_clone_voice, \
-         patch("vaani.pipeline.lipsync") as mock_lipsync, \
-         patch("vaani.pipeline.extract_audio_from_video") as mock_extract, \
-         patch("vaani.pipeline.time_stretch_audio") as mock_stretch, \
-         patch("vaani.pipeline.get_audio_duration") as mock_duration, \
-         patch("vaani.pipeline.get_video_duration") as mock_v_duration, \
-         patch("vaani.pipeline.unload_all_models") as mock_unload:
+    with patch("resonova.pipeline.transcribe") as mock_transcribe, \
+         patch("resonova.pipeline.translate") as mock_translate, \
+         patch("resonova.pipeline.clone_voice") as mock_clone_voice, \
+         patch("resonova.pipeline.lipsync") as mock_lipsync, \
+         patch("resonova.pipeline.extract_audio_from_video") as mock_extract, \
+         patch("resonova.pipeline.time_stretch_audio") as mock_stretch, \
+         patch("resonova.pipeline.get_audio_duration") as mock_duration, \
+         patch("resonova.pipeline.get_video_duration") as mock_v_duration, \
+         patch("resonova.pipeline.unload_all_models") as mock_unload:
 
         # Default return values
         mock_transcribe.return_value = "Hello, this is a test."

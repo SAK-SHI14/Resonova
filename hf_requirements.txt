@@ -1,5 +1,5 @@
 # ============================================================
-# Vaani — HuggingFace Spaces Runtime Requirements
+# Resonova — HuggingFace Spaces Runtime Requirements
 # ============================================================
 # Lighter than requirements.txt:
 #   - No dev/testing packages

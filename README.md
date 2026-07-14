@@ -1,29 +1,29 @@
 ---
-title: Vaani — Emotion-Preserving AI Video Dubbing
+title: Resonova — Emotion-Preserving AI Video Dubbing
 emoji: 🗣️
 colorFrom: violet
 colorTo: indigo
 sdk: gradio
 sdk_version: "4.44.0"
-app_file: vaani/app/spaces_app.py
+app_file: resonova/app/spaces_app.py
 pinned: true
 license: mit
 ---
 
-# Vaani 🗣️ — वाणी
+# Resonova 🗣️ — वाणी
 
 **English → Hindi video dubbing in your own voice, with emotion preserved.**
 
-[![HuggingFace Spaces](https://img.shields.io/badge/🤗-Live%20Demo-blue)](https://huggingface.co/spaces/SAK-SHI14/vaani-dubbing)
+[![HuggingFace Spaces](https://img.shields.io/badge/🤗-Live%20Demo-blue)](https://huggingface.co/spaces/SAK-SHI14/resonova-dubbing)
 [![Tests](https://img.shields.io/badge/tests-75%2B%20passing-brightgreen)]()
 [![ADRs](https://img.shields.io/badge/ADRs-6%20documented-blue)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
-## What Vaani Does
+## What Resonova Does
 
-Vaani takes a video of a person speaking English and produces a Hindi dubbed version
+Resonova takes a video of a person speaking English and produces a Hindi dubbed version
 in that speaker's own cloned voice — with lip movements re-synced and the original
 emotional delivery preserved.
 
@@ -55,7 +55,7 @@ fits on a free-tier T4 GPU, and is deployable with a single `docker compose up`.
 
 ### 🌐 Option 1: HuggingFace Spaces (no setup)
 
-**[Try Vaani live →](https://huggingface.co/spaces/SAK-SHI14/vaani-dubbing)**
+**[Try Resonova live →](https://huggingface.co/spaces/SAK-SHI14/resonova-dubbing)**
 
 ZeroGPU mode: ~2–4 min per 45-second clip (GPU) or ~20 min (CPU fallback).
 The UI tells you which mode is active before you submit.
@@ -65,8 +65,8 @@ The UI tells you which mode is active before you submit.
 ### 🐳 Option 2: Docker (recommended for local GPU)
 
 ```bash
-git clone https://github.com/SAK-SHI14/vaani
-cd vaani
+git clone https://github.com/SAK-SHI14/resonova
+cd resonova
 
 # Download Wav2Lip GAN checkpoint (~400 MB):
 mkdir wav2lip_checkpoints
@@ -84,7 +84,7 @@ For CPU-only machines, the UI loads but inference takes ~20 minutes per clip.
 
 ### 🧪 Option 3: Google Colab (development / no local GPU)
 
-Open [`notebooks/vaani_colab_template.ipynb`](notebooks/vaani_colab_template.ipynb)
+Open [`notebooks/resonova_colab_template.ipynb`](notebooks/resonova_colab_template.ipynb)
 in Google Colab with a **T4 GPU runtime**.
 The notebook restores the full environment from scratch in ~5 minutes.
 
@@ -153,8 +153,8 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for full details, mermaid diagrams, and a
 ## Repository Structure
 
 ```
-vaani/                  ← Root
-├── vaani/              ← Python source package
+resonova/                  ← Root
+├── resonova/              ← Python source package
 │   ├── pipeline.py     ← 6-stage orchestrator
 │   ├── asr/            ← Whisper wrapper
 │   ├── translation/    ← IndicTrans2 wrapper
@@ -219,7 +219,7 @@ including the responsible use statement on voice cloning.
 
 ```bash
 # Add the HuggingFace remote (replace with your Space URL)
-git remote add spaces https://huggingface.co/spaces/YOUR_USERNAME/vaani-dubbing
+git remote add spaces https://huggingface.co/spaces/YOUR_USERNAME/resonova-dubbing
 
 # Push — HF Spaces auto-detects app_file from README.md YAML header
 git push spaces main
@@ -227,7 +227,7 @@ git push spaces main
 # The Space will:
 #   1. Install packages.txt (ffmpeg, libsndfile1)
 #   2. pip install -r hf_requirements.txt
-#   3. Launch vaani/app/spaces_app.py
+#   3. Launch resonova/app/spaces_app.py
 ```
 
 ---

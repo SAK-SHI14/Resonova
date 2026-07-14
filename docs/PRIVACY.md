@@ -1,4 +1,4 @@
-# Vaani — Privacy Design Document
+# Resonova — Privacy Design Document
 
 ## TL;DR
 
@@ -21,7 +21,7 @@ Your videos are never stored, never shared, and never leave the session.
 
 ## Development Data
 
-Source clips used during development and evaluation of Vaani were:
+Source clips used during development and evaluation of Resonova were:
 
 - Recorded by the developer (Sakshi Verma) personally for evaluation purposes
 - Stored in a private Google Drive folder inaccessible to anyone else
@@ -35,7 +35,7 @@ Source clips used during development and evaluation of Vaani were:
 
 ## HuggingFace Spaces
 
-When using the hosted demo at `https://huggingface.co/spaces/SAK-SHI14/vaani-dubbing`:
+When using the hosted demo at `https://huggingface.co/spaces/SAK-SHI14/resonova-dubbing`:
 
 - Videos are processed within an isolated ZeroGPU session
 - **HuggingFace's own privacy policy** applies to the hosting environment:
@@ -61,18 +61,18 @@ When running `docker compose up` on your own machine:
 
 ## Responsible Use Statement
 
-Vaani is built for research and portfolio demonstration purposes.
+Resonova is built for research and portfolio demonstration purposes.
 
 AI voice cloning and lip-sync technology carries real risks of misuse.
 Users of this software are responsible for:
 
 - **Consent**: Having explicit consent from all people whose voice or likeness appears
-  in any video uploaded to Vaani
+  in any video uploaded to Resonova
 - **Legality**: Complying with applicable laws in their jurisdiction regarding
   synthetic media, impersonation, and voice cloning
-- **Non-deception**: Not using Vaani to create deceptive, misleading, or harmful content
+- **Non-deception**: Not using Resonova to create deceptive, misleading, or harmful content
 
-A production deployment of Vaani beyond portfolio demonstration would require:
+A production deployment of Resonova beyond portfolio demonstration would require:
 
 - Explicit consent flows before processing any personal media
 - Audit logging for misuse detection and accountability

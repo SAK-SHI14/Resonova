@@ -1,13 +1,13 @@
-# Vaani — वाणी | System Architecture
+# Resonova — वाणी | System Architecture
 
 > **Emotion-Preserving AI Video Dubbing Pipeline**
 > Applied AI & Intelligent Systems | Built June–July 2026
 
 ---
 
-## 1. What Vaani Does
+## 1. What Resonova Does
 
-Vaani takes a video of a person speaking English and produces a Hindi dubbed version
+Resonova takes a video of a person speaking English and produces a Hindi dubbed version
 in that speaker's own cloned voice — with lip movements re-synced and the original
 emotional delivery preserved. Upload a 30–90 second clip; get back the same person,
 the same energy, a different language. It runs entirely on open-weight models with
@@ -16,7 +16,7 @@ single `docker compose up` command.
 
 ---
 
-## 2. What Makes Vaani Different
+## 2. What Makes Resonova Different
 
 - **Prosody-preservation conditioning layer** — pitch (F0), RMS energy, and speaking
   rate extracted from the original clip are used to select a style-reference segment
@@ -76,20 +76,20 @@ graph TD
 
 ---
 
-## 5. Vaani's Unique Contributions
+## 5. Resonova's Unique Contributions
 
 ### 5a. Prosody-Preservation Conditioning Layer
 
 Most open-source dubbing pipelines produce flat, robotic-sounding translations
-because TTS models default to a neutral prosody style. Vaani's conditioning layer
+because TTS models default to a neutral prosody style. Resonova's conditioning layer
 prevents this in two steps:
 
-**Step 1 — Acoustic profiling** (`vaani/prosody/extract.py`)
+**Step 1 — Acoustic profiling** (`resonova/prosody/extract.py`)
 Using `librosa.yin()` for F0 pitch tracking and `librosa.feature.rms()` for energy,
 the system extracts the original speaker's prosodic fingerprint — mean pitch, pitch
 contour, RMS loudness, pause ratio, and syllable-onset rate.
 
-**Step 2 — Style transfer via reference clip** (`vaani/prosody/conditioning.py`)
+**Step 2 — Style transfer via reference clip** (`resonova/prosody/conditioning.py`)
 Rather than post-processing pitch digitally (which introduces artifacts), XTTS-v2's
 built-in style conditioning is used: the original audio track is passed directly as
 `speaker_wav`, which encodes the speaker's latent style (including emotional delivery)
@@ -122,7 +122,7 @@ See [ADR-005](docs/adrs/ADR-005-evaluation-methodology.md) for methodology ratio
 
 ### 5c. End-to-End Integration
 
-**Load-on-demand model lifecycle** (`vaani/pipeline.py`)
+**Load-on-demand model lifecycle** (`resonova/pipeline.py`)
 
 Each stage follows a strict pattern to fit 4 large models in 15 GB T4 VRAM:
 ```
@@ -134,7 +134,7 @@ Peak VRAM at any moment never exceeds ~4–5 GB. This is implemented in
 **atempo chaining for extreme duration ratios** (ADR-003)
 
 English→Hindi translation often produces text that is 1.2–1.8x longer or shorter
-than the original. FFmpeg's `atempo` filter is limited to `[0.5, 2.0]`. Vaani chains
+than the original. FFmpeg's `atempo` filter is limited to `[0.5, 2.0]`. Resonova chains
 multiple `atempo` filters for ratios outside this range:
 ```python
 # ratio = 4.5 → atempo=2.0,atempo=2.0,atempo=1.125
@@ -142,7 +142,7 @@ multiple `atempo` filters for ratios outside this range:
 ```
 This is implemented in `time_stretch_audio()` and covered by adversarial tests.
 
-**Checkpoint-resumption** (`vaani/pipeline.py`)
+**Checkpoint-resumption** (`resonova/pipeline.py`)
 
 Every pipeline stage writes its output to a `checkpoint_dir`. On the next call,
 completed stages are detected by file existence and skipped. This is critical for
@@ -229,8 +229,8 @@ All 6 ADRs are in [`docs/adrs/`](docs/adrs/):
 ## 10. Repository Structure
 
 ```
-vaani/                          ← Root of git repo (NOT the package)
-├── vaani/                      ← Python source package (lowercase — case-sensitivity fix)
+resonova/                          ← Root of git repo (NOT the package)
+├── resonova/                      ← Python source package (lowercase — case-sensitivity fix)
 │   ├── __init__.py
 │   ├── pipeline.py             ← Core 6-stage orchestrator
 │   ├── exceptions.py           ← Typed exception hierarchy
@@ -269,8 +269,8 @@ vaani/                          ← Root of git repo (NOT the package)
 │   ├── ADVERSARIAL_RESULTS.md  ← Stress test results and failure mode documentation
 │   └── PRIVACY.md              ← Privacy design document
 ├── notebooks/
-│   ├── vaani_colab_template.ipynb
-│   ├── vaani_kaggle_template.ipynb
+│   ├── resonova_colab_template.ipynb
+│   ├── resonova_kaggle_template.ipynb
 │   └── phase1_setup.ipynb
 ├── samples/                    ← Dubbed example clips only (no source footage)
 ├── outputs/                    ← Pipeline outputs (gitignored)
@@ -292,15 +292,15 @@ vaani/                          ← Root of git repo (NOT the package)
 
 ### Option A: HuggingFace Spaces (no setup)
 
-🔗 **[Try Vaani Live](https://huggingface.co/spaces/SAK-SHI14/vaani-dubbing)**
+🔗 **[Try Resonova Live](https://huggingface.co/spaces/SAK-SHI14/resonova-dubbing)**
 
 *Expected latency: 2–4 min per 45-second clip (ZeroGPU) or 20 min (CPU fallback)*
 
 ### Option B: Docker (recommended for local GPU use)
 
 ```bash
-git clone https://github.com/SAK-SHI14/vaani
-cd vaani
+git clone https://github.com/SAK-SHI14/resonova
+cd resonova
 
 # Download Wav2Lip checkpoint (~400 MB) and place at:
 # ./wav2lip_checkpoints/wav2lip_gan.pth
@@ -315,7 +315,7 @@ docker compose up --build
 
 ### Option C: Google Colab (development / no local GPU)
 
-Open [`notebooks/vaani_colab_template.ipynb`](notebooks/vaani_colab_template.ipynb)
+Open [`notebooks/resonova_colab_template.ipynb`](notebooks/resonova_colab_template.ipynb)
 in Google Colab with a T4 GPU runtime. The notebook restores the full environment
 in ~5 minutes from the session-start template.
 

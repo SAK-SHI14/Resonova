@@ -1,5 +1,5 @@
 """
-Unit tests for vaani.eval.benchmark
+Unit tests for resonova.eval.benchmark
 ====================================
 Run with: pytest tests/test_benchmark.py -v
 """
@@ -12,7 +12,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from vaani.eval.benchmark import (
+from resonova.eval.benchmark import (
     classify_emotion,
     generate_eval_report,
     run_ablation_study,
@@ -47,8 +47,8 @@ class TestBenchmark:
         emotion2 = classify_emotion(str(clip_path2))
         assert emotion2 == "angry"
 
-    @patch("vaani.eval.benchmark.get_ser_pipeline")
-    @patch("vaani.eval.benchmark.extract_prosody")
+    @patch("resonova.eval.benchmark.get_ser_pipeline")
+    @patch("resonova.eval.benchmark.extract_prosody")
     def test_classify_emotion_heuristic_fallback(
         self, mock_extract, mock_get_pipeline, temp_eval_dir
     ):
@@ -68,10 +68,10 @@ class TestBenchmark:
         emotion = classify_emotion(str(clip_path))
         assert emotion == "happy"
 
-    @patch("vaani.eval.benchmark.transcribe")
-    @patch("vaani.eval.benchmark.translate")
-    @patch("vaani.eval.benchmark.clone_voice")
-    @patch("vaani.eval.benchmark.apply_prosody_conditioning")
+    @patch("resonova.eval.benchmark.transcribe")
+    @patch("resonova.eval.benchmark.translate")
+    @patch("resonova.eval.benchmark.clone_voice")
+    @patch("resonova.eval.benchmark.apply_prosody_conditioning")
     def test_run_ravdess_emotion_eval(
         self, mock_apply, mock_clone, mock_translate, mock_transcribe, temp_eval_dir
     ):
@@ -106,9 +106,9 @@ class TestBenchmark:
         assert "confusion_matrix" in results
         assert "per_emotion_results" in results
 
-    @patch("vaani.eval.benchmark.translate")
-    @patch("vaani.eval.benchmark.compute_bleu")
-    @patch("vaani.eval.benchmark.compute_chrf")
+    @patch("resonova.eval.benchmark.translate")
+    @patch("resonova.eval.benchmark.compute_bleu")
+    @patch("resonova.eval.benchmark.compute_chrf")
     def test_run_flores_translation_eval(
         self, mock_chrf, mock_bleu, mock_translate, temp_eval_dir
     ):
@@ -135,9 +135,9 @@ class TestBenchmark:
         assert "published_baseline_bleu" in results
         assert "our_vs_baseline" in results
 
-    @patch("vaani.eval.benchmark.dub_video")
-    @patch("vaani.eval.benchmark.extract_audio_from_video")
-    @patch("vaani.eval.benchmark.speaker_similarity")
+    @patch("resonova.eval.benchmark.dub_video")
+    @patch("resonova.eval.benchmark.extract_audio_from_video")
+    @patch("resonova.eval.benchmark.speaker_similarity")
     def test_run_speaker_similarity_eval(
         self, mock_similarity, mock_extract, mock_dub_video, temp_eval_dir
     ):
@@ -160,11 +160,11 @@ class TestBenchmark:
         assert results["min_similarity"] == 0.85
         assert results["max_similarity"] == 0.85
 
-    @patch("vaani.eval.benchmark.dub_video")
-    @patch("vaani.eval.benchmark.extract_audio_from_video")
-    @patch("vaani.eval.benchmark.speaker_similarity")
-    @patch("vaani.eval.benchmark.emotion_agreement")
-    @patch("vaani.eval.benchmark.classify_emotion")
+    @patch("resonova.eval.benchmark.dub_video")
+    @patch("resonova.eval.benchmark.extract_audio_from_video")
+    @patch("resonova.eval.benchmark.speaker_similarity")
+    @patch("resonova.eval.benchmark.emotion_agreement")
+    @patch("resonova.eval.benchmark.classify_emotion")
     def test_run_ablation_study(
         self, mock_classify, mock_agreement, mock_similarity, mock_extract, mock_dub_video, temp_eval_dir
     ):
@@ -185,15 +185,15 @@ class TestBenchmark:
 
         assert results["clips_tested"] == 1
         assert results["baseline"]["speaker_similarity"] == 0.50
-        assert results["vaani_conditioned"]["speaker_similarity"] == 0.85
+        assert results["resonova_conditioned"]["speaker_similarity"] == 0.85
         assert results["improvement"]["speaker_similarity"] == pytest.approx(0.35)
 
         assert results["baseline"]["emotion_agreement"] == 0.35
-        assert results["vaani_conditioned"]["emotion_agreement"] == 0.75
+        assert results["resonova_conditioned"]["emotion_agreement"] == 0.75
         assert results["improvement"]["emotion_agreement"] == pytest.approx(0.40)
 
         assert results["baseline"]["ser_agreement"] == 0.0
-        assert results["vaani_conditioned"]["ser_agreement"] == 1.0
+        assert results["resonova_conditioned"]["ser_agreement"] == 1.0
         assert results["improvement"]["ser_agreement"] == pytest.approx(1.0)
 
     def test_generate_eval_report(self, temp_eval_dir):
@@ -224,7 +224,7 @@ class TestBenchmark:
                 "emotion_agreement": 0.3800,
                 "ser_agreement": 0.40,
             },
-            "vaani_conditioned": {
+            "resonova_conditioned": {
                 "speaker_similarity": 0.8650,
                 "emotion_agreement": 0.7600,
                 "ser_agreement": 0.80,
@@ -248,7 +248,7 @@ class TestBenchmark:
 
         assert report_path.is_file()
         content = report_path.read_text(encoding="utf-8")
-        assert "Project Vaani" in content
+        assert "Project Resonova" in content
         assert "Ablation Study: Style Conditioning ON vs. OFF" in content
         assert "86.50%" in content  # Speaker similarity formatted as percentage
         assert "80.00%" in content  # Emotion preservation formatted as percentage

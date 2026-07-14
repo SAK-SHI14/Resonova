@@ -3,13 +3,13 @@
 **Status:** Accepted  
 **Date:** Week 3, Phase 3  
 **Authors:** Sakshi Verma  
-**Context:** Project Vaani — evaluation suite
+**Context:** Project Resonova — evaluation suite
 
 ---
 
 ## Context
 
-Vaani needs a quantitative evaluation suite to measure the pipeline's performance across multiple dimensions:
+Resonova needs a quantitative evaluation suite to measure the pipeline's performance across multiple dimensions:
 1. **Translation Accuracy**: Does the Hindi output represent the same meaning?
 2. **Speaker Similarity**: Does the cloned voice sound like the original speaker?
 3. **Emotion/Prosody Preservation**: Is the emotional cadence (pace, pitch inflections, intensity) preserved?

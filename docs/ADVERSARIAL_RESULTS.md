@@ -1,4 +1,4 @@
-# Vaani — Adversarial Test Results
+# Resonova — Adversarial Test Results
 
 **Date:** July 2026 | **Test Suite:** `tests/test_adversarial.py` | **Tests:** 16
 

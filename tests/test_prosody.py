@@ -1,5 +1,5 @@
 """
-Unit tests for vaani.prosody
+Unit tests for resonova.prosody
 =============================
 Run with: pytest tests/test_prosody.py -v
 """
@@ -17,9 +17,9 @@ sys.modules['librosa'] = mock_librosa_obj
 sys.modules['librosa.onset'] = mock_librosa_obj.onset
 sys.modules['librosa.feature'] = mock_librosa_obj.feature
 
-from vaani.exceptions import ProsodyError
-from vaani.prosody.conditioning import apply_prosody_conditioning
-from vaani.prosody.extract import extract_prosody
+from resonova.exceptions import ProsodyError
+from resonova.prosody.conditioning import apply_prosody_conditioning
+from resonova.prosody.extract import extract_prosody
 
 
 @pytest.fixture(autouse=True)
@@ -75,7 +75,7 @@ class TestProsody:
         with pytest.raises(ProsodyError, match="too short"):
             extract_prosody(str(dummy_audio))
 
-    @patch("vaani.prosody.conditioning.extract_prosody")
+    @patch("resonova.prosody.conditioning.extract_prosody")
     @patch("subprocess.run")
     def test_apply_prosody_conditioning_runs_ffmpeg_volume(self, mock_run, mock_extract, tmp_path: Path):
         """apply_prosody_conditioning must scale volume using ffmpeg when energy levels mismatch."""
@@ -108,7 +108,7 @@ class TestProsody:
         filter_idx = cmd.index("-filter:a")
         assert cmd[filter_idx + 1] == "volume=2.0000"
 
-    @patch("vaani.prosody.conditioning.extract_prosody")
+    @patch("resonova.prosody.conditioning.extract_prosody")
     @patch("shutil.copy")
     def test_apply_prosody_conditioning_copies_if_rms_matched(self, mock_copy, mock_extract, tmp_path: Path):
         """apply_prosody_conditioning must copy file directly if energy levels match within 5%."""

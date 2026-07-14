@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # ============================================================
-# Vaani — Dockerfile
+# Resonova — Dockerfile
 # ============================================================
 # Base: CUDA 11.3 + cuDNN 8 runtime (matches pinned torch==1.12.1+cu113)
 # Python: 3.9 (pinned — Wav2Lip requires <3.10 for some deps)
@@ -14,13 +14,13 @@
 #   This is expected — see ADR-000 for the full deployment strategy.
 #
 # BUILD:
-#   docker build -t vaani:latest .
+#   docker build -t resonova:latest .
 #
 # RUN (with GPU, recommended):
 #   docker compose up
 #
 # RUN (CPU only — UI will load, inference will be very slow):
-#   docker run -p 7860:7860 vaani:latest
+#   docker run -p 7860:7860 resonova:latest
 # ============================================================
 
 FROM nvidia/cuda:11.3.1-cudnn8-runtime-ubuntu20.04
@@ -91,10 +91,10 @@ RUN git clone --depth 1 https://github.com/Rudrabha/Wav2Lip.git /app/Wav2Lip
 # face-alignment at exact pinned version (Wav2Lip requirement)
 RUN pip install --no-cache-dir face-alignment==1.3.5
 
-# ─── Copy Vaani project code ──────────────────────────────────────────────────
+# ─── Copy Resonova project code ──────────────────────────────────────────────────
 COPY . .
 
-# Install Vaani itself in editable mode
+# Install Resonova itself in editable mode
 RUN pip install --no-cache-dir -e .
 
 # ─── Environment variables ────────────────────────────────────────────────────
@@ -115,4 +115,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 # ─── Entrypoint ───────────────────────────────────────────────────────────────
 # Note: Wav2Lip checkpoint is NOT bundled in the image (400 MB).
 # Download it once and mount it via docker-compose volumes.
-CMD ["python", "-m", "vaani.app.launch"]
+CMD ["python", "-m", "resonova.app.launch"]

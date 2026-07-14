@@ -1,5 +1,5 @@
 """
-Unit tests for vaani.app.report_card and vaani.app.app
+Unit tests for resonova.app.report_card and resonova.app.app
 =====================================================
 Run with: pytest tests/test_report_card.py -v
 """
@@ -8,8 +8,8 @@ from unittest.mock import MagicMock, patch
 from PIL import Image
 import pytest
 
-from vaani.app.report_card import compute_preservation_score, generate_report_card
-from vaani.app.app import run_vaani_pipeline, create_app
+from resonova.app.report_card import compute_preservation_score, generate_report_card
+from resonova.app.app import run_resonova_pipeline, create_app
 
 
 class TestReportCard:
@@ -122,15 +122,15 @@ class TestReportCard:
 
 class TestAppInterface:
 
-    @patch("vaani.app.app.dub_video")
-    @patch("vaani.app.app.extract_prosody")
-    @patch("vaani.app.app.classify_emotion")
-    @patch("vaani.app.app.generate_report_card")
-    @patch("vaani.app.app.get_video_duration")
-    def test_run_vaani_pipeline_orchestration(
+    @patch("resonova.app.app.dub_video")
+    @patch("resonova.app.app.extract_prosody")
+    @patch("resonova.app.app.classify_emotion")
+    @patch("resonova.app.app.generate_report_card")
+    @patch("resonova.app.app.get_video_duration")
+    def test_run_resonova_pipeline_orchestration(
         self, mock_v_dur, mock_generate, mock_classify, mock_extract, mock_dub, tmp_path
     ):
-        """run_vaani_pipeline must call pipeline stage components and assemble returns under Gradio wrappers."""
+        """run_resonova_pipeline must call pipeline stage components and assemble returns under Gradio wrappers."""
         video_input = tmp_path / "source.mp4"
         video_input.write_bytes(b"\x00")
 
@@ -152,7 +152,7 @@ class TestAppInterface:
         progress_mock = MagicMock()
 
         # Run
-        res = run_vaani_pipeline(
+        res = run_resonova_pipeline(
             video_file=str(video_input),
             target_language="Hindi (हिंदी)",
             progress=progress_mock,

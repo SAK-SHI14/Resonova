@@ -1,14 +1,14 @@
 """
-Vaani — Adversarial Test Suite
+Resonova — Adversarial Test Suite
 ================================
 tests/test_adversarial.py
 
 These are stress tests, not unit tests.
-They deliberately try to break Vaani by hitting edge cases, boundary
+They deliberately try to break Resonova by hitting edge cases, boundary
 conditions, and known failure modes, then verify the system either:
 
   PASS          — handles it correctly and produces valid output
-  GRACEFUL FAIL — raises a clear, typed VaaniError (or subclass) with
+  GRACEFUL FAIL — raises a clear, typed ResonovaError (or subclass) with
                   a human-readable message
   BAD FAIL      — silently crashes or produces garbage (must be fixed)
 
@@ -30,21 +30,21 @@ from unittest.mock import MagicMock, patch
 import numpy as np
 import pytest
 
-from vaani.exceptions import (
+from resonova.exceptions import (
     AudioExtractionError,
     LipSyncError,
     TranscriptionError,
     TranslationError,
-    VaaniError,
+    ResonovaError,
     VoiceCloningError,
 )
-from vaani.pipeline import (
+from resonova.pipeline import (
     dub_video,
     extract_audio_from_video,
     get_audio_duration,
     time_stretch_audio,
 )
-from vaani.prosody.extract import extract_prosody
+from resonova.prosody.extract import extract_prosody
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -72,22 +72,22 @@ def _mock_all_stages(ckpt_dir: Path):
     functions so tests run without any GPU or model downloads.
     """
     return (
-        patch("vaani.pipeline.transcribe", return_value="Hello, this is a test."),
-        patch("vaani.pipeline.translate", return_value="नमस्ते, यह एक परीक्षण है।"),
+        patch("resonova.pipeline.transcribe", return_value="Hello, this is a test."),
+        patch("resonova.pipeline.translate", return_value="नमस्ते, यह एक परीक्षण है।"),
         patch(
-            "vaani.pipeline.clone_voice",
+            "resonova.pipeline.clone_voice",
             side_effect=lambda *a, **kw: (ckpt_dir / "cloned_audio_raw.wav").write_bytes(b"\x00" * 200),
         ),
         patch(
-            "vaani.pipeline.lipsync",
+            "resonova.pipeline.lipsync",
             side_effect=lambda video_path, audio_path, output_path: Path(output_path).write_bytes(b"\x00" * 300),
         ),
-        patch("vaani.pipeline.extract_audio_from_video",
+        patch("resonova.pipeline.extract_audio_from_video",
               side_effect=lambda src, dst: _make_wav(Path(dst), 10.0)),
-        patch("vaani.pipeline.get_audio_duration",
+        patch("resonova.pipeline.get_audio_duration",
               side_effect=lambda p: 10.0 if "extracted" in str(p) else 12.0),
-        patch("vaani.pipeline.unload_all_models"),
-        patch("vaani.pipeline.time_stretch_audio",
+        patch("resonova.pipeline.unload_all_models"),
+        patch("resonova.pipeline.time_stretch_audio",
               side_effect=lambda src, dst, r: Path(dst).write_bytes(b"\x00" * 200)),
     )
 
@@ -112,7 +112,7 @@ class TestEdgeCaseInputs:
         load), which is still a GRACEFUL FAIL — the caller receives a clear,
         actionable error rather than a silent crash.
         """
-        from vaani.voice_cloning.clone_voice import clone_voice
+        from resonova.voice_cloning.clone_voice import clone_voice
 
         short_clip = tmp_path / "short_clip.wav"
         _make_wav(short_clip, duration_s=5.0)
@@ -145,12 +145,12 @@ class TestEdgeCaseInputs:
 
         Result: GRACEFUL FAIL ✅ — transcription validates its output.
         """
-        from vaani.asr.transcribe import transcribe
+        from resonova.asr.transcribe import transcribe
 
         silent_audio = tmp_path / "silence.wav"
         _make_wav(silent_audio, duration_s=10.0)
 
-        with patch("vaani.asr.transcribe._load_model") as mock_load:
+        with patch("resonova.asr.transcribe._load_model") as mock_load:
             # Simulate Whisper returning empty text for silent audio
             mock_model = MagicMock()
             mock_model.transcribe.return_value = {"text": "   "}  # whitespace-only
@@ -173,7 +173,7 @@ class TestEdgeCaseInputs:
 
         Result: GRACEFUL FAIL ✅ — translate() validates its input.
         """
-        from vaani.translation.translate import translate
+        from resonova.translation.translate import translate
 
         with pytest.raises((TranslationError, ValueError)) as exc_info:
             translate("", source_lang="eng_Latn", target_lang="hin_Deva")
@@ -191,7 +191,7 @@ class TestEdgeCaseInputs:
 
         Result: GRACEFUL FAIL ✅ — language code validation is implemented.
         """
-        from vaani.translation.translate import translate
+        from resonova.translation.translate import translate
 
         with pytest.raises(ValueError) as exc_info:
             translate(
@@ -212,7 +212,7 @@ class TestEdgeCaseInputs:
         PASS (with degraded quality): If a speaker is already speaking Hindi
         and the pipeline is run English→Hindi, Whisper may produce a bad
         transcript (or auto-detect Hindi), but the pipeline must not crash.
-        The system should complete or raise a typed VaaniError.
+        The system should complete or raise a typed ResonovaError.
 
         Result: PASS ✅ — pipeline is orchestration-robust even with degraded inputs.
         """
@@ -224,17 +224,17 @@ class TestEdgeCaseInputs:
 
         with _mock_all_stages(ckpt_dir)[0], \
              _mock_all_stages(ckpt_dir)[1], \
-             patch("vaani.pipeline.transcribe", return_value="यह एक परीक्षण है") as mock_tr, \
-             patch("vaani.pipeline.translate", return_value="यह एक परीक्षण है") as mock_tl, \
-             patch("vaani.pipeline.clone_voice",
+             patch("resonova.pipeline.transcribe", return_value="यह एक परीक्षण है") as mock_tr, \
+             patch("resonova.pipeline.translate", return_value="यह एक परीक्षण है") as mock_tl, \
+             patch("resonova.pipeline.clone_voice",
                    side_effect=lambda *a, **kw: (ckpt_dir / "cloned_audio_raw.wav").write_bytes(b"\x00" * 200)), \
-             patch("vaani.pipeline.lipsync",
+             patch("resonova.pipeline.lipsync",
                    side_effect=lambda v, a, o: Path(o).write_bytes(b"\x00" * 300)), \
-             patch("vaani.pipeline.extract_audio_from_video",
+             patch("resonova.pipeline.extract_audio_from_video",
                    side_effect=lambda s, d: _make_wav(Path(d), 10.0)), \
-             patch("vaani.pipeline.get_audio_duration", return_value=10.0), \
-             patch("vaani.pipeline.unload_all_models"), \
-             patch("vaani.pipeline.time_stretch_audio",
+             patch("resonova.pipeline.get_audio_duration", return_value=10.0), \
+             patch("resonova.pipeline.unload_all_models"), \
+             patch("resonova.pipeline.time_stretch_audio",
                    side_effect=lambda s, d, r: Path(d).write_bytes(b"\x00" * 200)):
 
             try:
@@ -246,7 +246,7 @@ class TestEdgeCaseInputs:
                 )
                 # PASS: pipeline completed (may produce low-quality output — acceptable)
                 assert Path(result).exists() or True, "Pipeline returned a result path"
-            except VaaniError:
+            except ResonovaError:
                 pass  # GRACEFUL FAIL: typed exception — also acceptable
 
     # ── Test 6: Audio file not found ──────────────────────────────────────────
@@ -258,7 +258,7 @@ class TestEdgeCaseInputs:
 
         Result: GRACEFUL FAIL ✅ — input validation is first in transcribe().
         """
-        from vaani.asr.transcribe import transcribe
+        from resonova.asr.transcribe import transcribe
 
         with pytest.raises(FileNotFoundError) as exc_info:
             transcribe(str(tmp_path / "does_not_exist.wav"))
@@ -276,7 +276,7 @@ class TestEdgeCaseInputs:
 
         Result: GRACEFUL FAIL ✅ — path validation is first in clone_voice().
         """
-        from vaani.voice_cloning.clone_voice import clone_voice
+        from resonova.voice_cloning.clone_voice import clone_voice
 
         with pytest.raises(FileNotFoundError):
             clone_voice(
@@ -308,7 +308,7 @@ class TestEdgeCaseInputs:
         except (ImportError, ValueError):
             pytest.skip("librosa not installed — requires full GPU environment")
 
-        from vaani.exceptions import ProsodyError as _ProsodyError
+        from resonova.exceptions import ProsodyError as _ProsodyError
 
         mono_wav = tmp_path / "monotone.wav"
         _make_wav(mono_wav, duration_s=10.0)
@@ -393,16 +393,16 @@ class TestSystemBoundaries:
         (ckpt_dir / "transcript.txt").write_text("Prior transcript.", encoding="utf-8")
         (ckpt_dir / "translated_text.txt").write_text("पूर्व अनुवाद।", encoding="utf-8")
 
-        with patch("vaani.pipeline.transcribe") as mock_asr, \
-             patch("vaani.pipeline.translate") as mock_translate, \
-             patch("vaani.pipeline.extract_audio_from_video") as mock_extract, \
-             patch("vaani.pipeline.clone_voice",
+        with patch("resonova.pipeline.transcribe") as mock_asr, \
+             patch("resonova.pipeline.translate") as mock_translate, \
+             patch("resonova.pipeline.extract_audio_from_video") as mock_extract, \
+             patch("resonova.pipeline.clone_voice",
                    side_effect=lambda *a, **kw: (ckpt_dir / "cloned_audio_raw.wav").write_bytes(b"\x00" * 200)), \
-             patch("vaani.pipeline.lipsync",
+             patch("resonova.pipeline.lipsync",
                    side_effect=lambda *a, **kw: Path(kw["output_path"]).write_bytes(b"\x00" * 300)), \
-             patch("vaani.pipeline.get_audio_duration", return_value=10.0), \
-             patch("vaani.pipeline.unload_all_models"), \
-             patch("vaani.pipeline.time_stretch_audio",
+             patch("resonova.pipeline.get_audio_duration", return_value=10.0), \
+             patch("resonova.pipeline.unload_all_models"), \
+             patch("resonova.pipeline.time_stretch_audio",
                    side_effect=lambda s, d, r: Path(d).write_bytes(b"\x00" * 200)):
 
             dub_video(
@@ -432,17 +432,17 @@ class TestSystemBoundaries:
         ckpt_dir = tmp_path / "ckpt"
         ckpt_dir.mkdir()
 
-        with patch("vaani.pipeline.transcribe", return_value="Test text."), \
-             patch("vaani.pipeline.translate", return_value="परीक्षण पाठ।"), \
-             patch("vaani.pipeline.clone_voice",
+        with patch("resonova.pipeline.transcribe", return_value="Test text."), \
+             patch("resonova.pipeline.translate", return_value="परीक्षण पाठ।"), \
+             patch("resonova.pipeline.clone_voice",
                    side_effect=lambda *a, **kw: (ckpt_dir / "cloned_audio_raw.wav").write_bytes(b"\x00" * 500)), \
-             patch("vaani.pipeline.lipsync",
+             patch("resonova.pipeline.lipsync",
                    side_effect=lambda *a, **kw: Path(kw["output_path"]).write_bytes(b"\x00" * 1000)), \
-             patch("vaani.pipeline.extract_audio_from_video",
+             patch("resonova.pipeline.extract_audio_from_video",
                    side_effect=lambda s, d: _make_wav(Path(d), 10.0)), \
-             patch("vaani.pipeline.get_audio_duration", return_value=10.0), \
-             patch("vaani.pipeline.unload_all_models"), \
-             patch("vaani.pipeline.time_stretch_audio",
+             patch("resonova.pipeline.get_audio_duration", return_value=10.0), \
+             patch("resonova.pipeline.unload_all_models"), \
+             patch("resonova.pipeline.time_stretch_audio",
                    side_effect=lambda s, d, r: Path(d).write_bytes(b"\x00" * 500)):
 
             result_path = dub_video(
@@ -481,7 +481,7 @@ class TestSystemBoundaries:
 
         Result: PASS ✅ — cache guards are in each unload_model() function.
         """
-        from vaani.pipeline import unload_all_models
+        from resonova.pipeline import unload_all_models
 
         # Should not raise, even with empty caches and no GPU
         unload_all_models()
@@ -495,7 +495,7 @@ class TestSystemBoundaries:
 
         Result: GRACEFUL FAIL ✅ — duration check is in extract_prosody().
         """
-        from vaani.exceptions import ProsodyError
+        from resonova.exceptions import ProsodyError
 
         tiny_wav = tmp_path / "tiny.wav"
         _make_wav(tiny_wav, duration_s=0.05)  # 50ms — below threshold
@@ -514,7 +514,7 @@ class TestSystemBoundaries:
 
         Result: GRACEFUL FAIL ✅ — env var validation is first in lipsync().
         """
-        from vaani.lipsync.lipsync import lipsync
+        from resonova.lipsync.lipsync import lipsync
 
         video = tmp_path / "v.mp4"
         _make_dummy_video(video)

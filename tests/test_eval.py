@@ -1,5 +1,5 @@
 """
-Unit tests for vaani.eval.metrics
+Unit tests for resonova.eval.metrics
 ==================================
 Run with: pytest tests/test_eval.py -v
 """
@@ -15,7 +15,7 @@ import pytest
 mock_librosa_obj = MagicMock()
 sys.modules['librosa'] = mock_librosa_obj
 
-from vaani.eval.metrics import (
+from resonova.eval.metrics import (
     compute_bleu,
     compute_chrf,
     emotion_agreement,
@@ -53,7 +53,7 @@ class TestEval:
         assert 0.0 <= score <= 1.0
         assert score > 0.5
 
-    @patch("vaani.eval.metrics.extract_prosody")
+    @patch("resonova.eval.metrics.extract_prosody")
     def test_emotion_agreement_calculates_correlation(self, mock_extract, tmp_path: Path):
         """emotion_agreement must compute Pearson correlation for pitch and energy contours."""
         orig_wav = tmp_path / "orig.wav"
@@ -81,7 +81,7 @@ class TestEval:
         # Perfectly correlated contours must score near 1.0
         assert pytest.approx(score, abs=0.001) == 1.0
 
-    @patch("vaani.eval.metrics.extract_prosody")
+    @patch("resonova.eval.metrics.extract_prosody")
     def test_emotion_agreement_flat_contours_does_not_nan(self, mock_extract, tmp_path: Path):
         """emotion_agreement must return 0.5 (neutral correlation) if contours are flat (std=0)."""
         orig_wav = tmp_path / "orig.wav"
