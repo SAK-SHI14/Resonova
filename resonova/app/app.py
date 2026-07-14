@@ -204,7 +204,11 @@ def build_interface(
         ),
         css="""
             body, .gradio-container {
-                background-color: #f8edeb !important;
+                background-image: url('/file=resonova/app/background.png') !important;
+                background-size: cover !important;
+                background-position: center !important;
+                background-attachment: fixed !important;
+                background-repeat: no-repeat !important;
                 color: #2d3748 !important;
                 font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif !important;
             }
@@ -213,37 +217,39 @@ def build_interface(
                 margin: auto;
             }
             .compute-banner {
-                background: #ffe5d9 !important;
-                border: 1px solid #fec89a !important;
+                background: rgba(255, 229, 217, 0.85) !important;
+                border: 1px solid rgba(254, 200, 154, 0.6) !important;
+                backdrop-filter: blur(8px) !important;
                 border-radius: 12px;
                 padding: 12px 16px;
                 font-size: 0.95em;
                 margin-bottom: 20px;
                 color: #2d3748 !important;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
             }
             #submit_button, button.primary {
-                background-color: #fec89a !important;
+                background: linear-gradient(135deg, #fec5bb 0%, #fec89a 100%) !important;
                 color: #2d3748 !important;
-                border: 1px solid #ffd7ba !important;
+                border: none !important;
                 border-radius: 8px !important;
                 font-weight: 600 !important;
                 transition: all 0.2s ease-in-out !important;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+                box-shadow: 0 4px 15px rgba(254, 200, 154, 0.3) !important;
             }
             #submit_button:hover, button.primary:hover {
-                background-color: #ffd7ba !important;
-                transform: translateY(-1px);
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                background: linear-gradient(135deg, #fec89a 0%, #ffd7ba 100%) !important;
+                transform: translateY(-2px) !important;
+                box-shadow: 0 6px 20px rgba(254, 200, 154, 0.5) !important;
             }
             h1, h2, h3 {
                 color: #2d3748 !important;
             }
             .block {
-                border-color: #ece4db !important;
+                border: 1px solid rgba(236, 228, 219, 0.5) !important;
                 border-radius: 12px !important;
-                background-color: #ffffff !important;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+                background-color: rgba(255, 255, 255, 0.75) !important;
+                backdrop-filter: blur(10px) !important;
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05) !important;
             }
             .tabs {
                 border-bottom: 2px solid #ece4db !important;
@@ -386,4 +392,5 @@ if __name__ == "__main__":
         server_name=os.environ.get("GRADIO_SERVER_NAME", "0.0.0.0"),
         server_port=int(os.environ.get("GRADIO_SERVER_PORT", "7860")),
         show_error=True,
+        allowed_paths=[os.path.abspath("resonova/app/background.png")],
     )

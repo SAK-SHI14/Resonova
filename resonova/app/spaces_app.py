@@ -264,4 +264,4 @@ demo = build_interface(
 )
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(allowed_paths=[os.path.abspath("resonova/app/background.png")])
