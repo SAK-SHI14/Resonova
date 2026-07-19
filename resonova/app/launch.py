@@ -76,14 +76,28 @@ def main() -> None:
     logger.info("Starting Gradio server on %s:%d", server_name, server_port)
     logger.info("Open http://localhost:%d in your browser", server_port)
 
-    from resonova.app.app import create_app
+    from resonova.app.app import create_app, _STATIC_DIR, _load_css
+    import gradio as gr
+
     demo = create_app()
+
+    allowed = [os.path.abspath(_STATIC_DIR)] if os.path.isdir(_STATIC_DIR) else []
+    legacy_bg = os.path.abspath("resonova/app/background.png")
+    if os.path.isfile(legacy_bg):
+        allowed.append(legacy_bg)
 
     demo.launch(
         server_name=server_name,
         server_port=server_port,
         show_error=True,
         quiet=False,  # Show Gradio startup logs
+        allowed_paths=allowed,
+        theme=gr.themes.Base(
+            primary_hue=gr.themes.colors.orange,
+            neutral_hue=gr.themes.colors.gray,
+            font=[gr.themes.GoogleFont("Inter"), "system-ui", "sans-serif"],
+        ),
+        css=_load_css(),
     )
 
 

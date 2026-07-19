@@ -204,6 +204,14 @@ def dub_video(
     original_audio_path = ckpt_dir / "extracted_audio.wav"
     transcript_path = ckpt_dir / "transcript.txt"
     translated_text_path = ckpt_dir / "translated_text.txt"
+    
+    # Initialize/clear warnings.txt at pipeline start
+    warnings_path = ckpt_dir / "warnings.txt"
+    if warnings_path.is_file():
+        try:
+            warnings_path.unlink()
+        except Exception:
+            pass
 
     suffix = "_neutral" if voice_reference_path else ""
     cloned_audio_raw_path = ckpt_dir / f"cloned_audio_raw{suffix}.wav"
@@ -282,7 +290,6 @@ def dub_video(
     if cloned_audio_raw_path.is_file():
         logger.info("[Pipeline] Checkpoint found: cloned voice generated. Skipping Voice Cloning.")
     else:
-        logger.info("[Pipeline] Running Voice Cloning...")
         try:
             unload_all_models()
             # XTTS requires language code like 'hi' instead of 'hin_Deva'
@@ -298,7 +305,16 @@ def dub_video(
             logger.info("[Pipeline] Voice Cloning complete. Saved cloned voice to checkpoint.")
             unload_voice()
         except Exception as exc:
-            raise VoiceCloningError(f"Voice cloning stage failed: {exc}") from exc
+            logger.warning("[Pipeline] Voice cloning failed or not installed: %s. Reverting to original audio fallback.", exc)
+            try:
+                with open(warnings_path, "a", encoding="utf-8") as wf:
+                    wf.write(f"Voice Cloning failed: {exc}. Reverted to original speaker audio.\n")
+            except Exception:
+                pass
+            try:
+                shutil.copy(str(original_audio_path), str(cloned_audio_raw_path))
+            except Exception as copy_exc:
+                raise VoiceCloningError(f"Voice cloning fallback failed: {copy_exc}") from copy_exc
     timings["Voice Cloning (XTTS)"] = time.perf_counter() - t0
 
     if progress_cb:
@@ -365,7 +381,40 @@ def dub_video(
             shutil.copy(str(final_video_temp_path), str(dest_video))
             logger.info("[Pipeline] Lip-Sync complete. Final dubbed video created.")
         except Exception as exc:
-            raise LipSyncError(f"Lip-Sync stage failed: {exc}") from exc
+            logger.warning("[Pipeline] Lip-Sync stage failed or skipped: %s. Reverting to video/audio muxing fallback.", exc)
+            try:
+                with open(warnings_path, "a", encoding="utf-8") as wf:
+                    wf.write(f"Lip-Sync stage failed: {exc}. Reverted to video-audio muxing fallback.\n")
+            except Exception:
+                pass
+            try:
+                # Mux the source video stream with the synced audio stream using ffmpeg
+                import subprocess
+                cmd = [
+                    "ffmpeg",
+                    "-i", str(src_video),
+                    "-i", str(cloned_audio_synced_path),
+                    "-c:v", "copy",
+                    "-c:a", "aac",
+                    "-map", "0:v:0",
+                    "-map", "1:a:0",
+                    str(final_video_temp_path),
+                    "-y",
+                    "-loglevel", "error"
+                ]
+                subprocess.run(cmd, check=True)
+            except Exception as mux_exc:
+                logger.warning("[Pipeline] ffmpeg muxing failed: %s. Copying source video directly.", mux_exc)
+                try:
+                    with open(warnings_path, "a", encoding="utf-8") as wf:
+                        wf.write(f"ffmpeg muxing failed: {mux_exc}. Copied original source video directly (no audio/video sync).\n")
+                except Exception:
+                    pass
+                try:
+                    shutil.copy(str(src_video), str(final_video_temp_path))
+                except Exception as copy_exc:
+                    raise LipSyncError(f"Lip-sync fallback copy failed: {copy_exc}") from copy_exc
+            shutil.copy(str(final_video_temp_path), str(dest_video))
     timings["Lip-Sync (Wav2Lip)"] = time.perf_counter() - t0
 
     pipeline_duration = time.perf_counter() - t_pipeline_start

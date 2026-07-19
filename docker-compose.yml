@@ -51,7 +51,7 @@ services:
     volumes:
       # Wav2Lip checkpoint (download separately — not bundled in image)
       # Uncomment after downloading wav2lip_gan.pth:
-      # - ./wav2lip_checkpoints:/app/Wav2Lip/checkpoints:ro
+      - ./wav2lip_checkpoints:/app/Wav2Lip/checkpoints:ro
       #
       # HuggingFace model cache (persist downloaded models across restarts)
       - hf_cache:/app/.cache/huggingface

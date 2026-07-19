@@ -264,4 +264,7 @@ demo = build_interface(
 )
 
 if __name__ == "__main__":
-    demo.launch(allowed_paths=[os.path.abspath("resonova/app/background.png")])
+    _static = os.path.abspath("resonova/app/static")
+    _legacy = os.path.abspath("resonova/app/background.png")
+    _allowed = [p for p in [_static, _legacy] if os.path.exists(p)]
+    demo.launch(allowed_paths=_allowed)

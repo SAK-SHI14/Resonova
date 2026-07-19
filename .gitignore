@@ -1,4 +1,4 @@
-# Vaani .gitignore
+# Resonova .gitignore
 
 # ─── Model Weights (large files — do NOT commit) ───
 *.pth
@@ -39,7 +39,7 @@ build/
 .venv/
 venv/
 env/
-vaani_env/
+resonova_env/
 
 # ─── Jupyter ───
 .ipynb_checkpoints/
@@ -63,3 +63,14 @@ logs/
 # ─── Downloaded repos (not committed — documented in README) ───
 IndicTrans2/
 Wav2Lip/
+
+# ─── Windows local binaries (use apt-get install ffmpeg on Linux/Colab) ───
+ffmpeg.exe
+ffprobe.exe
+ffmpeg
+ffprobe
+
+# ─── Temporary / generated images ───
+*.png
+!samples/example_*.png
+ChatGPT*.png

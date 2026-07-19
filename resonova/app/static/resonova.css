@@ -1,0 +1,418 @@
+/* ═══════════════════════════════════════════════════
+   RESONOVA — COMPLETE FIXED THEME CSS v3
+   Warm Peach / Apricot Aesthetic
+   Fixes: dark upload, dark dropdown, dark textbox,
+          dark video labels, dark blocks
+═══════════════════════════════════════════════════ */
+
+/* ── CSS VARIABLES OVERRIDE (Gradio 4/5/6 theming) ── */
+:root {
+    --background-fill-primary:               #ffffff !important;
+    --background-fill-secondary:             #fff8f3 !important;
+    --border-color-primary:                  #f5c5a3 !important;
+    --border-color-accent:                   #f4a261 !important;
+    --color-accent:                          #f4a261 !important;
+    --color-accent-soft:                     #fec89a !important;
+    --input-background-fill:                 #fff8f3 !important;
+    --input-background-fill-focus:           #fff3e8 !important;
+    --input-border-color:                    #f5c5a3 !important;
+    --input-border-color-focus:              #f4a261 !important;
+    --input-placeholder-color:              #9ca3af !important;
+    --button-primary-background-fill:        linear-gradient(135deg, #fec89a, #f4a261) !important;
+    --button-primary-background-fill-hover:  linear-gradient(135deg, #f4a261, #e07b39) !important;
+    --button-primary-text-color:             #2d3748 !important;
+    --button-secondary-background-fill:      #fff8f3 !important;
+    --button-secondary-border-color:         #fec89a !important;
+    --button-secondary-text-color:           #c2663a !important;
+    --block-background-fill:                 #ffffff !important;
+    --block-border-color:                    #ece4db !important;
+    --block-label-background-fill:           #fff3e8 !important;
+    --block-label-border-color:              #fec89a !important;
+    --block-label-text-color:                #c2663a !important;
+    --panel-background-fill:                 #fdf6f0 !important;
+    --panel-border-color:                    #ece4db !important;
+    --body-background-fill:                  #fdf6f0 !important;
+    --body-text-color:                       #2d3748 !important;
+    --body-text-color-subdued:               #6b7280 !important;
+    --shadow-drop:                           0 2px 12px rgba(0,0,0,0.06) !important;
+    --shadow-drop-lg:                        0 4px 20px rgba(244,162,97,0.15) !important;
+    --color-text-body:                       #2d3748 !important;
+    --color-text-subdued:                    #6b7280 !important;
+    --checkbox-background-color:             #fff8f3 !important;
+    --checkbox-border-color:                 #f5c5a3 !important;
+    --color-grey-200:                        #ece4db !important;
+    --color-grey-100:                        #fdf6f0 !important;
+}
+
+/* ── GOOGLE FONTS ── */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+
+/* ── GLOBAL ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, .gradio-container, .main, footer {
+    font-family: "Inter", "Segoe UI", system-ui, sans-serif !important;
+    min-height: 100vh;
+}
+
+body {
+    background: #fdf6f0 !important;
+    position: relative;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: "" !important;
+    position: fixed !important;
+    top: -50% !important;
+    left: -50% !important;
+    right: -50% !important;
+    bottom: -50% !important;
+    width: 200vw !important;
+    height: 200vh !important;
+    background: 
+        radial-gradient(circle at 30% 30%, #fec89a 0%, transparent 40%),
+        radial-gradient(circle at 70% 40%, #f4a261 0%, transparent 40%),
+        radial-gradient(circle at 40% 70%, #ffb5a7 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, #cdb4db 0%, transparent 40%),
+        radial-gradient(circle at 20% 80%, #ffd166 0%, transparent 35%) !important;
+    filter: blur(80px) !important;
+    opacity: 0.45 !important;
+    z-index: -1 !important;
+    animation: rotateMesh 45s infinite linear !important;
+    pointer-events: none !important;
+}
+
+@keyframes rotateMesh {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.gradio-container {
+    max-width: 1600px !important;
+    margin: 0 auto !important;
+    padding: 0 24px 32px !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+}
+
+/* ── TRANSPARENT WRAPPER PASS-THROUGH ── */
+.gr-form, .gr-panel, .gr-block,
+div.block, div.form, div.panel,
+.gap, .gr-padded,
+.contain, .container.svelte-1f354aw,
+.svelte-vt7sn0 {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* ── HEADER ── */
+.resonova-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #fff8f3, #fdf6f0) !important;
+    border-radius: 16px;
+    margin-bottom: 12px;
+    border: 1px solid #f5c5a3 !important;
+    box-shadow: 0 2px 20px rgba(244,162,97,.12);
+    flex-wrap: wrap;
+}
+.resonova-title {
+    font-size: 2.5rem !important;
+    font-weight: 800 !important;
+    color: #2d3748 !important;
+    letter-spacing: -.5px !important;
+    margin: 0 !important;
+}
+.resonova-subtitle {
+    font-size: 1rem !important;
+    color: #6b7280 !important;
+    margin: 6px 0 0 0 !important;
+}
+
+/* ── METRICS BAR ── */
+.metrics-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    padding: 14px 8px;
+    background: #fff8f3 !important;
+    border-radius: 14px;
+    border: 1px solid #f5c5a3 !important;
+    margin: 14px 0 0 0;
+    flex-wrap: wrap;
+}
+.metric-item { text-align: center; padding: 4px 28px; border-right: 1px solid #f5c5a3; }
+.metric-item:last-child { border-right: none; }
+.metric-value { font-size: 1.5rem; font-weight: 800; color: #e07b39; line-height: 1.2; }
+.metric-label { font-size: .65rem; color: #6b7280; text-transform: uppercase; letter-spacing: .8px; margin-top: 3px; }
+
+/* ── COMPUTE BANNERS ── */
+.banner-cpu, .banner-gpu {
+    padding: 10px 16px; border-radius: 10px; font-size: .875rem;
+    font-weight: 500; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+.banner-cpu { background: #fff8f3 !important; color: #c2663a; border: 1px solid #fec89a !important; }
+.banner-gpu { background: #f0fdf4 !important; color: #166534; border: 1px solid #bbf7d0 !important; }
+
+/* ── COMPONENT LABELS ── */
+label, .gr-block label, span.svelte-1b6s6s,
+.block > .label-wrap > span, .block > label {
+    font-size: .76rem !important;
+    font-weight: 700 !important;
+    color: #c2663a !important;
+    text-transform: uppercase !important;
+    letter-spacing: .6px !important;
+    background: transparent !important;
+}
+
+/* ── UPLOAD / VIDEO DROP ZONE (FIX dark) ── */
+.upload-container, div.wrap, div.wrap.svelte-z7cif2,
+.file-drop, .upload-btn, .icon-wrap,
+.gr-file-upload, [data-testid="upload-btn"],
+.svelte-1rjryqp, .boundedheight,
+.video-upload-container,
+div[data-testid="video"] > div > div {
+    background: #fff8f3 !important;
+    background-color: #fff8f3 !important;
+    border: 2px dashed #fec89a !important;
+    border-radius: 14px !important;
+    color: #c2663a !important;
+}
+.upload-container svg, .file-drop svg,
+[data-testid="upload-btn"] svg, div.wrap svg { color: #f4a261 !important; stroke: #f4a261 !important; }
+.upload-container p, .upload-container span,
+.file-drop p, .file-drop span,
+[data-testid="upload-btn"] span { color: #c2663a !important; }
+
+/* ── DROPDOWN (FIX dark) ── */
+select, .gr-dropdown, .gr-dropdown select,
+[data-testid="dropdown"], .dropdown-container,
+.wrap-inner, input.scroll-hide, .multiselect,
+.svelte-select, .token {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #2d3748 !important;
+    border: 1.5px solid #f5c5a3 !important;
+    border-radius: 10px !important;
+}
+select:focus, .gr-dropdown:focus, [data-testid="dropdown"]:focus {
+    border-color: #f4a261 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(244,162,97,.15) !important;
+}
+ul.options, .dropdown-item, ul.options li {
+    background: #ffffff !important;
+    color: #2d3748 !important;
+}
+ul.options li:hover, .dropdown-item:hover { background: #fff3e8 !important; color: #c2663a !important; }
+
+/* ── TEXTBOX / STATUS BOX (FIX dark) ── */
+textarea, input[type="text"],
+.gr-textbox textarea, .gr-textbox input,
+[data-testid="textbox"] textarea,
+[data-testid="textbox"] input,
+.scroll-hide, .gr-input {
+    background: #fff8f3 !important;
+    background-color: #fff8f3 !important;
+    color: #2d3748 !important;
+    border: 1px solid #f5c5a3 !important;
+    border-radius: 10px !important;
+    font-size: .875rem !important;
+    padding: 10px 14px !important;
+}
+textarea::placeholder, input[type="text"]::placeholder { color: #9ca3af !important; }
+
+/* ── VIDEO CONTAINER (FIX dark) ── */
+.gr-video, [data-testid="video"] {
+    background: #ffffff !important;
+    border: 1px solid #ece4db !important;
+    border-radius: 14px !important;
+    padding: 10px !important;
+}
+video {
+    border-radius: 12px !important;
+    border: 1px solid #ece4db !important;
+    background: #f9f5f2 !important;
+    width: 100% !important;
+}
+/* Hide Gradio auto-generated dark video label pills */
+.gr-video label, .gr-video .label-wrap,
+[data-testid="video"] label,
+[data-testid="video"] .label-wrap,
+span.svelte-1cl284s {
+    display: none !important;
+}
+
+/* ── CUSTOM VIDEO LABEL (our HTML) ── */
+.video-custom-label {
+    font-size: .72rem; font-weight: 700; color: #c2663a;
+    text-transform: uppercase; letter-spacing: .5px;
+    margin: 0 0 6px 0; padding: 4px 10px;
+    background: #fff3e8; border-radius: 6px;
+    display: inline-block; border: 1px solid #fec89a;
+}
+
+/* ── BLOCKS AS CARDS ── */
+.left-panel, .right-panel {
+    background: #ffffff !important;
+    border-radius: 16px !important;
+    border: 1px solid #ece4db !important;
+    padding: 20px !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,.05) !important;
+}
+
+/* ── PRIMARY BUTTON ── */
+button.primary, .primary-btn, button[variant="primary"] {
+    background: linear-gradient(135deg, #fec89a 0%, #f4a261 100%) !important;
+    color: #2d3748 !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 14px 28px !important;
+    box-shadow: 0 4px 15px rgba(244,162,97,.35) !important;
+    transition: all .2s ease !important;
+    width: 100% !important;
+    cursor: pointer !important;
+}
+button.primary:hover, .primary-btn:hover, button[variant="primary"]:hover {
+    background: linear-gradient(135deg, #f4a261 0%, #e07b39 100%) !important;
+    box-shadow: 0 6px 20px rgba(224,123,57,.4) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* ── TABS ── */
+.tabs, [role="tablist"] {
+    background: #fff3e8 !important;
+    border-radius: 12px !important;
+    padding: 4px !important;
+    border: 1px solid #f5c5a3 !important;
+    display: flex !important;
+    gap: 4px !important;
+}
+[role="tab"] {
+    border-radius: 8px !important; padding: 8px 16px !important;
+    font-weight: 600 !important; font-size: .83rem !important;
+    color: #6b7280 !important; background: transparent !important;
+    border: none !important; cursor: pointer !important;
+    transition: all .2s ease !important; white-space: nowrap;
+}
+[role="tab"]:hover { background: #ffd7ba !important; color: #2d3748 !important; }
+[role="tab"][aria-selected="true"], button.selected {
+    background: linear-gradient(135deg, #fec89a 0%, #f4a261 100%) !important;
+    color: #2d3748 !important; font-weight: 700 !important;
+    box-shadow: 0 2px 8px rgba(244,162,97,.3) !important;
+}
+
+/* ── ACCORDION ── */
+.gr-accordion, details {
+    background: #ffffff !important;
+    border: 1px solid #ece4db !important;
+    border-radius: 12px !important;
+    margin-top: 12px;
+}
+details summary {
+    font-size: .85rem !important; font-weight: 600 !important;
+    color: #c2663a !important; padding: 12px 16px !important; cursor: pointer !important;
+}
+
+/* ── EMOTION REPORT CARD IMAGE ── */
+.gr-image img, [data-testid="image"] img {
+    border-radius: 12px !important;
+    border: 1px solid #ece4db !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,.08) !important;
+    width: 100% !important;
+}
+
+/* ── PRIVACY FOOTER ── */
+.privacy-footer {
+    text-align: center; font-size: .74rem; color: #9ca3af;
+    margin-top: 20px; padding: 12px; border-top: 1px solid #ece4db;
+}
+.privacy-footer a { color: #c2663a; text-decoration: none; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #fdf6f0; }
+::-webkit-scrollbar-thumb { background: #fec89a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #f4a261; }
+
+/* ── HIDE GRADIO FOOTER ── */
+footer, .footer { display: none !important; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+    .resonova-title { font-size: 1.7rem !important; }
+    .metrics-bar { flex-direction: column; }
+    .metric-item { border-right: none; border-bottom: 1px solid #f5c5a3; padding: 8px 0; }
+    .metric-item:last-child { border-bottom: none; }
+}
+
+/* ── LANDSCAPE HEADER LAYOUT ── */
+.resonova-header-text {
+    flex: 0 0 auto;
+    text-align: left;
+}
+.resonova-title {
+    font-size: 1.8rem !important;
+    font-weight: 800 !important;
+    color: #2d3748 !important;
+    letter-spacing: -.5px !important;
+    margin: 0 !important;
+    line-height: 1.1 !important;
+}
+.resonova-subtitle {
+    font-size: .82rem !important;
+    color: #6b7280 !important;
+    margin: 2px 0 0 0 !important;
+}
+
+/* Metrics bar inline in header for landscape */
+.metrics-bar {
+    display: flex !important;
+    justify-content: flex-start !important;
+    flex: 1 1 auto;
+    gap: 0;
+    padding: 8px 16px;
+    background: rgba(255,248,243,.7) !important;
+    border-radius: 12px;
+    border: 1px solid #f5c5a3 !important;
+    margin: 0 !important;
+    flex-wrap: wrap;
+}
+.metric-item { text-align: center; padding: 2px 20px; border-right: 1px solid #f5c5a3; }
+.metric-item:last-child { border-right: none; }
+.metric-value { font-size: 1.25rem; font-weight: 800; color: #e07b39; line-height: 1.2; }
+.metric-label { font-size: .6rem; color: #6b7280; text-transform: uppercase; letter-spacing: .8px; margin-top: 2px; }
+
+/* Make both columns stretch to equal height */
+.gr-row { align-items: stretch !important; }
+
+/* Taller transcript boxes in landscape */
+#original_text_display textarea,
+#translated_text_display textarea {
+    min-height: 200px !important;
+}
+
+/* Wider image for report card in landscape */
+[data-testid="image"] img, .gr-image img {
+    max-height: 420px !important;
+    object-fit: contain !important;
+}
+
+/* Responsive: revert to stacked on small screens */
+@media (max-width: 900px) {
+    .resonova-header { flex-direction: column; text-align: center; }
+    .resonova-header-text { text-align: center; }
+    .metrics-bar { justify-content: center !important; flex: none; width: 100%; }
+    .resonova-title { font-size: 1.7rem !important; }
+    .gradio-container { max-width: 100% !important; padding: 0 10px 24px !important; }
+}
