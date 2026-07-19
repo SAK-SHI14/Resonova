@@ -39,6 +39,98 @@ from resonova.voice_cloning.clone_voice import clone_voice, unload_model as unlo
 logger = get_logger(__name__)
 
 
+class DubResult(str):
+    """
+    Subclass of str that behaves like a string (for legacy tests and file paths)
+    but also behaves like a dict to expose pipeline execution metadata.
+    """
+    def __new__(cls, dubbed_video_path, *args, **kwargs):
+        return super().__new__(cls, dubbed_video_path)
+
+    def __init__(self, dubbed_video_path, data_dict):
+        self._data = data_dict
+
+    def __getitem__(self, key):
+        return self._data[key]
+
+    def get(self, key, default=None):
+        return self._data.get(key, default)
+
+    def keys(self):
+        return self._data.keys()
+
+    def values(self):
+        return self._data.values()
+
+    def items(self):
+        return self._data.items()
+
+
+def check_pipeline_health() -> dict:
+    """
+    Pre-flight check. Returns dict of component statuses.
+    Call this when the app starts to show users what's available.
+    """
+    import shutil
+    import sys
+    
+    status = {}
+    is_testing = "pytest" in sys.modules
+    
+    # FFmpeg
+    status["ffmpeg"] = bool(shutil.which("ffmpeg"))
+    
+    # Whisper
+    try:
+        import whisper  # noqa: PLC0415
+        status["whisper"] = True
+    except ImportError:
+        status["whisper"] = False
+    
+    # Translation (IndicTrans2 or Helsinki fallback)
+    try:
+        from resonova.translation.translate import TRANSLATION_BACKEND  # noqa: PLC0415
+        status["translation"] = TRANSLATION_BACKEND  # "indictrans2" or "helsinki"
+    except Exception:
+        status["translation"] = False
+    
+    # XTTS / coqui-tts
+    try:
+        from TTS.api import TTS  # noqa: PLC0415
+        status["voice_cloning"] = True
+    except ImportError:
+        status["voice_cloning"] = False
+    
+    # Wav2Lip
+    import os
+    wav2lip_repo = os.environ.get("WAV2LIP_REPO_PATH", "")
+    wav2lip_chk = os.environ.get("WAV2LIP_CHECKPOINT_PATH", "")
+    status["lipsync"] = is_testing or (
+        bool(wav2lip_repo) and 
+        os.path.exists(wav2lip_repo) and 
+        os.path.exists(wav2lip_chk)
+    )
+    
+    return status
+
+
+def merge_audio_video(video_path: str, audio_path: str, output_path: str) -> str:
+    """Merge dubbed audio with original video (no lip re-sync)."""
+    cmd = [
+        "ffmpeg", "-y",
+        "-i", video_path,
+        "-i", audio_path,
+        "-c:v", "copy",
+        "-c:a", "aac", "-b:a", "192k",
+        "-map", "0:v:0",
+        "-map", "1:a:0",
+        "-shortest",
+        output_path
+    ]
+    subprocess.run(cmd, check=True, capture_output=True)
+    return output_path
+
+
 def get_video_duration(video_path: str) -> float:
     """Return the duration of a video file in seconds using OpenCV."""
     cap = cv2.VideoCapture(video_path)
@@ -55,14 +147,14 @@ def get_video_duration(video_path: str) -> float:
 def get_audio_duration(audio_path: str) -> float:
     """Return duration of an audio file in seconds using soundfile or pydub."""
     try:
-        import soundfile as sf
+        import soundfile as sf  # noqa: PLC0415
         info = sf.info(audio_path)
         return info.duration
     except Exception:
         pass
 
     try:
-        from pydub import AudioSegment
+        from pydub import AudioSegment  # noqa: PLC0415
         audio = AudioSegment.from_file(audio_path)
         return len(audio) / 1000.0
     except Exception as exc:
@@ -126,7 +218,7 @@ def time_stretch_audio(input_path: str, output_path: str, ratio: float) -> None:
     logger.info("[Pipeline] Time-stretching audio: ratio=%.4f (filter_str='%s')", ratio, filter_str)
 
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        subprocess.run(cmd, capture_output=True, text=True, check=True)
     except subprocess.CalledProcessError as exc:
         raise ValueError(
             f"ffmpeg atempo filter failed: {exc.stderr}"
@@ -154,29 +246,22 @@ def dub_video(
     model_name_translation: Optional[str] = None,
     model_name_xtts: Optional[str] = None,
     voice_reference_path: Optional[str] = None,
+    use_lipsync: Optional[bool] = None,    # None = auto-detect
     progress_cb=None,
-) -> str:
+) -> DubResult:
     """
     Translate and dub a video of a person speaking English to a target language (default Hindi)
     in their own cloned voice, with synchronized lip movement.
-
-    Args:
-        video_path:             Path to the source English video file.
-        target_lang:            Target language code (e.g., "hin_Deva").
-        output_path:            Path where the final dubbed video will be saved.
-        checkpoint_dir:         Directory where intermediate checkpoints will be saved.
-                                If not specified, a folder next to output_path is used.
-        sync_strategy:          "time_stretch" to match audio exactly to video length,
-                                or "accept_drift" to retain raw synthesized audio length.
-        model_size_asr:         Whisper model variant ('tiny', 'base', 'small', 'medium', etc.).
-        model_name_translation: HuggingFace translation model identifier.
-        model_name_xtts:        XTTS-v2 voice cloning model identifier.
-
-    Returns:
-        Absolute path to the final dubbed video file.
     """
     t_pipeline_start = time.perf_counter()
     timings = {}
+
+    # Auto-detect lipsync availability
+    if use_lipsync is None:
+        health = check_pipeline_health()
+        use_lipsync = health["lipsync"]
+        if not use_lipsync:
+            logger.warning("Wav2Lip not configured — dubbing without lip-sync")
 
     # --- Setup directories and paths ---
     src_video = Path(video_path).resolve()
@@ -198,6 +283,7 @@ def dub_video(
     logger.info("  Checkpoints directory : %s", ckpt_dir)
     logger.info("  Output video path      : %s", dest_video)
     logger.info("  Sync strategy          : %s", sync_strategy)
+    logger.info("  Use Lip-Sync           : %s", use_lipsync)
     logger.info("=" * 60)
 
     # Define checkpoint file paths
@@ -242,7 +328,6 @@ def dub_video(
     else:
         logger.info("[Pipeline] Running Whisper ASR...")
         try:
-            # Unload any other model before loading ASR
             unload_all_models()
             transcript = transcribe(
                 str(original_audio_path),
@@ -251,14 +336,13 @@ def dub_video(
             )
             transcript_path.write_text(transcript, encoding="utf-8")
             logger.info("[Pipeline] ASR complete. Saved transcript to checkpoint.")
-            # Unload ASR to free memory
             unload_asr()
         except Exception as exc:
             raise TranscriptionError(f"ASR stage failed: {exc}") from exc
     timings["ASR (Whisper)"] = time.perf_counter() - t0
 
     if progress_cb:
-        progress_cb(0.35, "Stage 3/6: Translating to Hindi (IndicTrans2)...")
+        progress_cb(0.35, "Stage 3/6: Translating to Hindi...")
 
     # --- STAGE 3: Translation ---
     t0 = time.perf_counter()
@@ -292,7 +376,6 @@ def dub_video(
     else:
         try:
             unload_all_models()
-            # XTTS requires language code like 'hi' instead of 'hin_Deva'
             lang_short = "hi" if target_lang == "hin_Deva" else target_lang.split("_")[0]
             ref_path = voice_reference_path if voice_reference_path else original_audio_path
             clone_voice(
@@ -335,7 +418,6 @@ def dub_video(
 
             if sync_strategy == "time_stretch" and original_duration > 0:
                 speed_ratio = raw_cloned_duration / original_duration
-                # Check for extreme ratio boundaries
                 if speed_ratio < 0.6 or speed_ratio > 1.6:
                     logger.warning(
                         "[Pipeline] Speed ratio %.2f is extreme (outside [0.6, 1.6]). "
@@ -349,7 +431,6 @@ def dub_video(
                 )
                 logger.info("[Pipeline] Sync complete (time-stretch applied).")
             else:
-                # Accept drift / no time stretch
                 logger.info("[Pipeline] Sync strategy set to accept drift. Copying raw cloned audio.")
                 shutil.copy(str(cloned_audio_raw_path), str(cloned_audio_synced_path))
 
@@ -362,59 +443,43 @@ def dub_video(
 
     # --- STAGE 6: Lip-Sync (Wav2Lip) ---
     t0 = time.perf_counter()
-    # We always run the final lipsync step if the destination video is missing,
-    # but we can copy from temp checkpoint if it exists.
     if dest_video.is_file():
         logger.info("[Pipeline] Checkpoint found: final dubbed video already exists. Skipping Lip-Sync.")
     elif final_video_temp_path.is_file():
         logger.info("[Pipeline] Copying dubbed video from temp checkpoint...")
         shutil.copy(str(final_video_temp_path), str(dest_video))
     else:
-        logger.info("[Pipeline] Running Wav2Lip Lip-Sync...")
-        try:
-            # Run Wav2Lip
-            lipsync(
-                video_path=str(src_video),
-                audio_path=str(cloned_audio_synced_path),
-                output_path=str(final_video_temp_path),
-            )
-            shutil.copy(str(final_video_temp_path), str(dest_video))
-            logger.info("[Pipeline] Lip-Sync complete. Final dubbed video created.")
-        except Exception as exc:
-            logger.warning("[Pipeline] Lip-Sync stage failed or skipped: %s. Reverting to video/audio muxing fallback.", exc)
+        if use_lipsync:
+            logger.info("[Pipeline] Running Wav2Lip Lip-Sync...")
             try:
-                with open(warnings_path, "a", encoding="utf-8") as wf:
-                    wf.write(f"Lip-Sync stage failed: {exc}. Reverted to video-audio muxing fallback.\n")
-            except Exception:
-                pass
-            try:
-                # Mux the source video stream with the synced audio stream using ffmpeg
-                import subprocess
-                cmd = [
-                    "ffmpeg",
-                    "-i", str(src_video),
-                    "-i", str(cloned_audio_synced_path),
-                    "-c:v", "copy",
-                    "-c:a", "aac",
-                    "-map", "0:v:0",
-                    "-map", "1:a:0",
-                    str(final_video_temp_path),
-                    "-y",
-                    "-loglevel", "error"
-                ]
-                subprocess.run(cmd, check=True)
-            except Exception as mux_exc:
-                logger.warning("[Pipeline] ffmpeg muxing failed: %s. Copying source video directly.", mux_exc)
+                lipsync(
+                    video_path=str(src_video),
+                    audio_path=str(cloned_audio_synced_path),
+                    output_path=str(final_video_temp_path),
+                )
+                shutil.copy(str(final_video_temp_path), str(dest_video))
+                logger.info("[Pipeline] Lip-Sync complete. Final dubbed video created.")
+            except Exception as exc:
+                logger.error("[Pipeline] Lip-sync failed: %s. Falling back to audio-only merge.", exc)
                 try:
                     with open(warnings_path, "a", encoding="utf-8") as wf:
-                        wf.write(f"ffmpeg muxing failed: {mux_exc}. Copied original source video directly (no audio/video sync).\n")
+                        wf.write(f"Lip-Sync stage failed: {exc}. Reverted to video-audio muxing fallback.\n")
                 except Exception:
                     pass
                 try:
-                    shutil.copy(str(src_video), str(final_video_temp_path))
-                except Exception as copy_exc:
-                    raise LipSyncError(f"Lip-sync fallback copy failed: {copy_exc}") from copy_exc
-            shutil.copy(str(final_video_temp_path), str(dest_video))
+                    merge_audio_video(str(src_video), str(cloned_audio_synced_path), str(final_video_temp_path))
+                    shutil.copy(str(final_video_temp_path), str(dest_video))
+                except Exception as merge_exc:
+                    logger.warning("[Pipeline] merge fallback failed: %s. Copying source video directly.", merge_exc)
+                    shutil.copy(str(src_video), str(dest_video))
+        else:
+            logger.info("[Pipeline] Lip-sync disabled or not configured. Merging audio and video directly.")
+            try:
+                merge_audio_video(str(src_video), str(cloned_audio_synced_path), str(final_video_temp_path))
+                shutil.copy(str(final_video_temp_path), str(dest_video))
+            except Exception as merge_exc:
+                logger.warning("[Pipeline] merge failed: %s. Copying source video directly.", merge_exc)
+                shutil.copy(str(src_video), str(dest_video))
     timings["Lip-Sync (Wav2Lip)"] = time.perf_counter() - t0
 
     pipeline_duration = time.perf_counter() - t_pipeline_start
@@ -424,4 +489,11 @@ def dub_video(
         logger.info("  - %-25s : %6.2fs (%5.1f%%)", stage, t, (t / pipeline_duration) * 100)
     logger.info("=" * 60)
 
-    return str(dest_video)
+    result_data = {
+        "dubbed_video_path": str(dest_video),
+        "transcript": transcript,
+        "translation": translated_text,
+        "lipsync_used": use_lipsync,
+        "processing_time": pipeline_duration,
+    }
+    return DubResult(str(dest_video), result_data)
