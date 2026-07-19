@@ -36,17 +36,41 @@ if os.environ.get("SPACES_AUTHOR_NAME") or "spaces" in os.environ.get("PATH", ""
     import sys
     import urllib.request
 
-    # 1. Clone & Install IndicTrans2 if missing
-    if not os.path.exists("IndicTrans2"):
-        logger.info("HF Space Startup: Cloning IndicTrans2...")
-        subprocess.run(["git", "clone", "https://github.com/AI4Bharat/IndicTrans2.git"])
-        logger.info("HF Space Startup: Installing IndicTrans2/IndicTransToolkit...")
-        subprocess.run([sys.executable, "-m", "pip", "install", "-e", "IndicTrans2/"])
+    # 1. Install IndicTransToolkit if missing
+    try:
+        from IndicTransToolkit import IndicProcessor
+        logger.info("HF Space Startup: IndicTransToolkit already available.")
+    except ImportError:
+        logger.info("HF Space Startup: Installing IndicTransToolkit from PyPI...")
+        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "IndicTransToolkit"])
 
     # 2. Clone Wav2Lip if missing
     if not os.path.exists("Wav2Lip"):
         logger.info("HF Space Startup: Cloning Wav2Lip...")
         subprocess.run(["git", "clone", "https://github.com/Rudrabha/Wav2Lip.git"])
+
+        # Patch Wav2Lip for numpy 1.24+ compatibility (no np.bool, np.int etc.)
+        logger.info("HF Space Startup: Patching Wav2Lip for numpy 1.24+...")
+        replacements = [
+            ('np.bool,', 'bool,'), ('np.bool)', 'bool)'), ('np.bool ', 'bool '),
+            ('np.int,', 'int,'), ('np.int)', 'int)'), ('np.int ', 'int '),
+            ('np.float,', 'float,'), ('np.float)', 'float)'), ('np.float ', 'float '),
+            ('np.complex,', 'complex,'), ('np.complex)', 'complex)'), ('np.complex ', 'complex '),
+            ('np.object,', 'object,'), ('np.object)', 'object)'), ('np.object ', 'object '),
+            ('np.str,', 'str,'), ('np.str)', 'str)'), ('np.str ', 'str '),
+        ]
+        for root, _, files in os.walk("Wav2Lip"):
+            for fname in files:
+                if fname.endswith(".py"):
+                    fpath = os.path.join(root, fname)
+                    with open(fpath, "r", encoding="utf-8", errors="ignore") as f:
+                        content = f.read()
+                    patched = content
+                    for old, new in replacements:
+                        patched = patched.replace(old, new)
+                    if patched != content:
+                        with open(fpath, "w", encoding="utf-8") as f:
+                            f.write(patched)
 
     # 3. Download Wav2Lip GAN checkpoint if missing
     ckpt_dir = "Wav2Lip/checkpoints"
@@ -63,7 +87,6 @@ if os.environ.get("SPACES_AUTHOR_NAME") or "spaces" in os.environ.get("PATH", ""
     os.environ["WAV2LIP_REPO_PATH"] = os.path.abspath("Wav2Lip")
     os.environ["WAV2LIP_CHECKPOINT_PATH"] = os.path.abspath(ckpt_path)
     
-    sys.path.append(os.path.abspath("IndicTrans2"))
     sys.path.append(os.path.abspath("Wav2Lip"))
     logger.info("HF Space Startup: Setup completed successfully.")
 
