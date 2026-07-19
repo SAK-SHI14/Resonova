@@ -51,31 +51,27 @@ def _load_model(model_name: str):
     """
     Load (or retrieve from cache) IndicTrans2 model and tokenizer.
 
-    IndicTrans2 uses HuggingFace Transformers under the hood but requires
-    its own custom tokenizer from the IndicTrans2 repository.
+    If IndicTrans2 fails due to dependency or environment conflicts (e.g., Python 3.12 compatibility),
+    falls back gracefully to Helsinki-NLP/opus-mt-en-hi.
 
     Args:
         model_name: HuggingFace model identifier.
 
     Returns:
-        Tuple of (model, tokenizer, inference_engine).
-
-    Raises:
-        TranslationError: If the model cannot be loaded.
+        Tuple of (model, tokenizer, inference_engine, is_fallback).
     """
     if model_name in _model_cache:
-        logger.debug("IndicTrans2 model '%s' loaded from cache.", model_name)
+        logger.debug("Translation model '%s' loaded from cache.", model_name)
         return _model_cache[model_name]
 
     logger.info(
-        "Loading IndicTrans2 model '%s' — first run may take 1–3 min for download...",
+        "Loading translation model '%s' — first run may take 1–3 min for download...",
         model_name,
     )
     t0 = time.perf_counter()
 
     try:
-        # IndicTrans2 requires its own inference engine from the cloned repo.
-        # The repo must be installed with: pip install -e IndicTrans2/
+        # Attempt to load IndicTrans2
         from IndicTransToolkit import IndicProcessor  # noqa: PLC0415
         from transformers import AutoModelForSeq2SeqLM, AutoTokenizer  # noqa: PLC0415
 
@@ -89,27 +85,42 @@ def _load_model(model_name: str):
         model.eval()
 
         processor = IndicProcessor(inference=True)
+        
+        elapsed = time.perf_counter() - t0
+        logger.info("IndicTrans2 model loaded in %.1f s | device='%s'", elapsed, device)
+        
+        cached = (model, tokenizer, processor, False)
+        _model_cache[model_name] = cached
+        return cached
 
-    except ImportError as exc:
-        raise TranslationError(
-            "IndicTrans2 dependencies not installed. "
-            "Run: git clone https://github.com/AI4Bharat/IndicTrans2 && "
-            "pip install -e IndicTrans2/ "
-            f"Original error: {exc}"
-        ) from exc
     except Exception as exc:
-        raise TranslationError(
-            f"Failed to load IndicTrans2 model '{model_name}': {exc}\n"
-            "Check GPU memory (model requires ~4 GB VRAM for 1B variant). "
-            "Ensure trust_remote_code=True is passed."
-        ) from exc
-
-    elapsed = time.perf_counter() - t0
-    logger.info("IndicTrans2 model loaded in %.1f s | device='%s'", elapsed, device)
-
-    cached = (model, tokenizer, processor)
-    _model_cache[model_name] = cached
-    return cached
+        logger.warning(
+            "Failed to load IndicTrans2 model '%s' due to dependency/env issues: %s. "
+            "Falling back to Helsinki-NLP/opus-mt-en-hi translator.",
+            model_name, exc
+        )
+        try:
+            from transformers import pipeline  # noqa: PLC0415
+            import torch  # noqa: PLC0415
+            device = 0 if torch.cuda.is_available() else -1
+            
+            # Load fallback Helsinki model
+            translator = pipeline(
+                "translation",
+                model="Helsinki-NLP/opus-mt-en-hi",
+                device=device,
+            )
+            elapsed = time.perf_counter() - t0
+            logger.info("Fallback Helsinki-NLP translator loaded in %.1f s", elapsed)
+            
+            cached = (translator, None, None, True)
+            _model_cache[model_name] = cached
+            return cached
+        except Exception as fallback_exc:
+            raise TranslationError(
+                f"Failed to load IndicTrans2 AND fallback translator: {fallback_exc}. "
+                f"Original IndicTrans2 error: {exc}"
+            ) from fallback_exc
 
 
 def translate(
@@ -120,7 +131,9 @@ def translate(
     max_length: int = 512,
 ) -> str:
     """
-    Translate text from source language to target language using IndicTrans2.
+    Translate text from source language to target language.
+
+    Uses IndicTrans2 by default, and falls back to Helsinki-NLP/opus-mt-en-hi if needed.
 
     Args:
         text:         The input text to translate. Must be non-empty.
@@ -154,13 +167,11 @@ def translate(
     if source_lang not in SUPPORTED_LANGS:
         raise ValueError(
             f"Unsupported source_lang: '{source_lang}'. "
-            f"Supported codes: {sorted(SUPPORTED_LANGS)}. "
-            "See IndicTrans2 documentation for the full list."
+            f"Supported codes: {sorted(SUPPORTED_LANGS)}."
         )
     if target_lang not in SUPPORTED_LANGS:
         raise ValueError(
-            f"Unsupported target_lang: '{target_lang}'. "
-            f"Supported codes: {sorted(SUPPORTED_LANGS)}."
+            f"Unsupported target_lang: '{target_lang}'."
         )
 
     # --- Resolve model name ---
@@ -176,69 +187,80 @@ def translate(
     t_start = time.perf_counter()
 
     # --- Load model ---
-    model, tokenizer, processor = _load_model(model_name)
+    model_data = _load_model(model_name)
+    is_fallback = model_data[3]
 
-    # --- Preprocess ---
-    try:
-        import torch  # noqa: PLC0415
+    if is_fallback:
+        # --- Fallback translation execution ---
+        translator = model_data[0]
+        try:
+            result = translator(text.strip(), max_length=max_length)
+            translation = result[0]["translation_text"]
+        except Exception as exc:
+            raise TranslationError(f"Fallback translation failed: {exc}") from exc
+    else:
+        # --- IndicTrans2 execution ---
+        model, tokenizer, processor = model_data[0], model_data[1], model_data[2]
+        
+        # Preprocess
+        try:
+            import torch  # noqa: PLC0415
 
-        batch = processor.preprocess_batch(
-            [text.strip()],
-            src_lang=source_lang,
-            tgt_lang=target_lang,
-        )
-        inputs = tokenizer(
-            batch,
-            truncation=True,
-            padding="longest",
-            return_tensors="pt",
-            return_attention_mask=True,
-        )
-        device = next(model.parameters()).device
-        inputs = {k: v.to(device) for k, v in inputs.items()}
-
-    except Exception as exc:
-        raise TranslationError(
-            f"IndicTrans2 preprocessing failed: {exc}"
-        ) from exc
-
-    # --- Generate ---
-    try:
-        with torch.no_grad():
-            generated_tokens = model.generate(
-                **inputs,
-                use_cache=True,
-                min_length=0,
-                max_length=max_length,
-                num_beams=5,
-                num_return_sequences=1,
+            batch = processor.preprocess_batch(
+                [text.strip()],
+                src_lang=source_lang,
+                tgt_lang=target_lang,
             )
-
-        with tokenizer.as_target_tokenizer():
-            generated_tokens = tokenizer.batch_decode(
-                generated_tokens.detach().cpu().tolist(),
-                skip_special_tokens=True,
-                clean_up_tokenization_spaces=True,
+            inputs = tokenizer(
+                batch,
+                truncation=True,
+                padding="longest",
+                return_tensors="pt",
+                return_attention_mask=True,
             )
+            device = next(model.parameters()).device
+            inputs = {k: v.to(device) for k, v in inputs.items()}
 
-        translations = processor.postprocess_batch(generated_tokens, lang=target_lang)
+        except Exception as exc:
+            raise TranslationError(
+                f"IndicTrans2 preprocessing failed: {exc}"
+            ) from exc
 
-    except Exception as exc:
-        raise TranslationError(
-            f"IndicTrans2 generation failed: {exc}\n"
-            "Possible causes: GPU OOM (try shorter input), model not loaded correctly, "
-            "or tokenizer mismatch. Check notes.md for known fixes."
-        ) from exc
+        # Generate
+        try:
+            with torch.no_grad():
+                generated_tokens = model.generate(
+                    **inputs,
+                    use_cache=True,
+                    min_length=0,
+                    max_length=max_length,
+                    num_beams=5,
+                    num_return_sequences=1,
+                )
 
-    # --- Validate output ---
-    if not translations or not translations[0].strip():
-        raise TranslationError(
-            "IndicTrans2 returned an empty translation. "
-            f"Input was: '{text[:80]}...' | src='{source_lang}' | tgt='{target_lang}'. "
-            "This may indicate a tokenizer issue or unsupported language pair."
-        )
+            with tokenizer.as_target_tokenizer():
+                generated_tokens = tokenizer.batch_decode(
+                    generated_tokens.detach().cpu().tolist(),
+                    skip_special_tokens=True,
+                    clean_up_tokenization_spaces=True,
+                )
 
-    translation = translations[0].strip()
+            translations = processor.postprocess_batch(generated_tokens, lang=target_lang)
+
+        except Exception as exc:
+            raise TranslationError(
+                f"IndicTrans2 generation failed: {exc}\n"
+                "Possible causes: GPU OOM (try shorter input), model not loaded correctly, "
+                "or tokenizer mismatch."
+            ) from exc
+
+        # Validate
+        if not translations or not translations[0].strip():
+            raise TranslationError(
+                "IndicTrans2 returned an empty translation. "
+                f"Input was: '{text[:80]}...' | src='{source_lang}' | tgt='{target_lang}'."
+            )
+        translation = translations[0].strip()
 
     # Sanity check: if translating to Hindi, output should contain Devanagari script
     if target_lang == "hin_Deva":
