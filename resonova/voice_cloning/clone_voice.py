@@ -105,7 +105,7 @@ def _load_tts_model(model_name: str):
     except ImportError as exc:
         raise VoiceCloningError(
             "Coqui TTS is not installed. "
-            "Run: pip install TTS==0.22.0"
+            "Run: pip install coqui-tts  (Python 3.12 compatible community fork)"
         ) from exc
 
     logger.info(

@@ -27,7 +27,9 @@ indic-nlp-library>=0.91
 # git clone https://github.com/AI4Bharat/IndicTrans2 && pip install -e IndicTrans2/
 
 # ----- Voice Cloning -----
-TTS>=0.22.0
+# NOTE: original 'TTS' package requires Python <3.12 (unmaintained).
+# 'coqui-tts' is the Python 3.12 compatible community fork with identical API.
+coqui-tts
 
 # ----- Prosody / Audio -----
 librosa>=0.10.0
@@ -56,7 +58,7 @@ scipy>=1.10.0
 # Wav2Lip is run via subprocess (not imported directly).
 # The following are needed for face detection inside the subprocess:
 face-alignment==1.4.1      # 1.3.5 requires torch<2; 1.4.1 supports torch 2.x
-opencv-python==4.5.5.64
+opencv-python>=4.8.0       # 4.5.5.64 has no Py3.12 wheel
 
 # ----- Misc -----
 python-dotenv>=1.0.0

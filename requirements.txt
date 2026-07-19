@@ -1,7 +1,7 @@
 # ============================================================
 # Resonova — Colab / Local Requirements (Python 3.12 compatible)
 # ============================================================
-# Python 3.12 NOTE:
+# Python 3.12 NOTES:
 #   torch==1.12.1+cu113  → no Py3.12 wheel → use pre-installed or torch>=2.0
 #   numpy==1.23.5         → no Py3.12 wheel → use numpy<2.0 (1.26.x on Py3.12)
 #   librosa==0.8.1        → no Py3.12 wheel → use librosa>=0.10.0
@@ -43,7 +43,9 @@ indic-nlp-library>=0.91
 mosestokenizer>=1.2.1
 
 # ----- Voice Cloning -----
-TTS>=0.22.0
+# NOTE: original 'TTS' package (Coqui) requires Python <3.12 and is unmaintained.
+# 'coqui-tts' is the community fork with identical API and Python 3.12 support.
+coqui-tts
 
 # ----- Lip Sync (face detection for Wav2Lip subprocess) -----
 face-alignment==1.4.1      # 1.3.5 requires torch<2; 1.4.1 works with torch 2.x
