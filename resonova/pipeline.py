@@ -38,6 +38,25 @@ from resonova.voice_cloning.clone_voice import clone_voice, unload_model as unlo
 
 logger = get_logger(__name__)
 
+# ── Auto-Detect winget-installed FFmpeg on Windows ──
+if os.name == "nt":
+    import shutil
+    if not shutil.which("ffmpeg"):
+        local_appdata = os.environ.get("LOCALAPPDATA", "")
+        if local_appdata:
+            winget_packages = os.path.join(local_appdata, "Microsoft", "WinGet", "Packages")
+            if os.path.exists(winget_packages):
+                found_bin = False
+                for root, dirs, files in os.walk(winget_packages):
+                    if "ffmpeg.exe" in files:
+                        bin_dir = os.path.abspath(root)
+                        logger.info("[Pipeline] Auto-detected FFmpeg bin path: '%s'. Appending to PATH.", bin_dir)
+                        os.environ["PATH"] = bin_dir + os.pathsep + os.environ["PATH"]
+                        found_bin = True
+                        break
+                if not found_bin:
+                    logger.debug("[Pipeline] FFmpeg binary not found in winget packages directory.")
+
 
 class DubResult(str):
     """
