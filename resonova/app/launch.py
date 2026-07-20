@@ -33,6 +33,20 @@ def main() -> None:
     wav2lip_repo = os.environ.get("WAV2LIP_REPO_PATH", "")
     wav2lip_ckpt = os.environ.get("WAV2LIP_CHECKPOINT_PATH", "")
 
+    # Auto-detect fallback
+    if not wav2lip_repo:
+        from pathlib import Path
+        project_root = Path(__file__).resolve().parents[2]
+        default_repo = project_root / "Wav2Lip"
+        if default_repo.is_dir():
+            wav2lip_repo = str(default_repo.resolve())
+
+    if not wav2lip_ckpt and wav2lip_repo:
+        from pathlib import Path
+        default_ckpt = Path(wav2lip_repo) / "checkpoints" / "wav2lip_gan.pth"
+        if default_ckpt.is_file():
+            wav2lip_ckpt = str(default_ckpt.resolve())
+
     if not wav2lip_repo or not os.path.isdir(wav2lip_repo):
         logger.warning(
             "WAV2LIP_REPO_PATH not set or not found: '%s'. "
@@ -85,6 +99,13 @@ def main() -> None:
     legacy_bg = os.path.abspath("resonova/app/background.png")
     if os.path.isfile(legacy_bg):
         allowed.append(legacy_bg)
+    
+    # Allow serving files from local outputs directory
+    from pathlib import Path
+    project_root = Path(__file__).resolve().parents[2]  # resonova/resonova/app/launch.py -> resonova/
+    outputs_dir = project_root / "outputs"
+    outputs_dir.mkdir(exist_ok=True)
+    allowed.append(str(outputs_dir.resolve()))
 
     demo.launch(
         server_name=server_name,
