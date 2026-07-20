@@ -34,6 +34,7 @@ Usage:
 """
 
 import os
+import subprocess
 import time
 from pathlib import Path
 from typing import Optional
@@ -233,11 +234,10 @@ def clone_voice(
     )
     t_start = time.perf_counter()
 
-    # --- Load model ---
-    tts = _load_tts_model(model_name)
-
-    # --- Synthesize ---
+    # --- Load model and Synthesize ---
+    use_gtts = False
     try:
+        tts = _load_tts_model(model_name)
         tts.tts_to_file(
             text=text,
             speaker_wav=str(ref_path),
@@ -245,20 +245,65 @@ def clone_voice(
             file_path=str(out_path),
         )
     except Exception as exc:
-        raise VoiceCloningError(
-            f"XTTS-v2 synthesis failed: {exc}\n"
-            f"  text='{text[:80]}...'\n"
-            f"  language='{language}'\n"
-            f"  reference='{reference_audio_path}'\n"
-            "Possible causes: unsupported language code, GPU OOM, "
-            "corrupted reference clip, or text too long (try shorter chunks). "
-            "See notes.md for known fixes."
-        ) from exc
+        # Only fall back to gTTS if Coqui is not installed
+        if isinstance(exc, VoiceCloningError) and "Coqui TTS is not installed" in str(exc):
+            logger.warning(
+                "[VoiceCloning] Coqui TTS is not installed. "
+                "Attempting to fall back to Google Text-to-Speech (gTTS)..."
+            )
+            use_gtts = True
+        else:
+            if isinstance(exc, VoiceCloningError):
+                raise exc
+            raise VoiceCloningError(
+                f"XTTS-v2 synthesis failed: {exc}\n"
+                f"  text='{text[:80]}...'\n"
+                f"  language='{language}'\n"
+                f"  reference='{reference_audio_path}'\n"
+                "Possible causes: unsupported language code, GPU OOM, "
+                "corrupted reference clip, or text too long (try shorter chunks). "
+                "See notes.md for known fixes."
+            ) from exc
+
+    if use_gtts:
+        try:
+            from gtts import gTTS  # noqa: PLC0415
+            import tempfile
+            
+            # gTTS generates MP3 data
+            temp_mp3 = tempfile.mktemp(suffix=".mp3")
+            # Map full target_lang to language code for gtts (e.g. "hin_Deva" -> "hi")
+            gtts_lang = "hi" if "hi" in language.lower() else language.split("_")[0]
+            tts_gtts = gTTS(text=text, lang=gtts_lang)
+            tts_gtts.save(temp_mp3)
+            
+            # Convert MP3 to target output WAV via ffmpeg
+            cmd = [
+                "ffmpeg", "-y",
+                "-i", temp_mp3,
+                "-acodec", "pcm_s16le",
+                "-ar", "16000",
+                "-ac", "1",
+                str(out_path)
+            ]
+            subprocess.run(cmd, check=True, capture_output=True)
+            
+            # Cleanup temp file
+            try:
+                os.remove(temp_mp3)
+            except Exception:
+                pass
+                
+            logger.info("[VoiceCloning] gTTS fallback successful. Generated audio at '%s'.", out_path)
+        except Exception as fallback_exc:
+            raise VoiceCloningError(
+                f"Both XTTS-v2 and gTTS fallback failed. gTTS Error: {fallback_exc}"
+            ) from fallback_exc
 
     # --- Validate output ---
     if not out_path.exists() or out_path.stat().st_size == 0:
         raise VoiceCloningError(
-            f"XTTS-v2 appeared to succeed but output file is missing or empty: '{output_path}'."
+            f"TTS synthesis appeared to succeed but output file is missing or empty: '{output_path}'."
         )
 
     # Verify audio has non-zero duration

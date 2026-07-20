@@ -135,7 +135,9 @@ class TestAppInterface:
         video_input.write_bytes(b"\x00")
 
         # Mock stages
-        mock_dub.return_value = str(tmp_path / "source_dubbed.mp4")
+        dubbed_file = tmp_path / "source_dubbed.mp4"
+        dubbed_file.write_bytes(b"\x00" * 1024)
+        mock_dub.return_value = str(dubbed_file)
         mock_extract.return_value = {
             "mean_pitch": 180.0,
             "std_pitch": 10.0,

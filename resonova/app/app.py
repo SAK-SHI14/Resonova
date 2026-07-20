@@ -361,6 +361,18 @@ video {
 ::-webkit-scrollbar-thumb { background: #fec89a; border-radius: 3px; }
 """
 
+_STATIC_DIR = str(Path(__file__).parent / "static")
+
+def _load_css() -> str:
+    """Load the custom CSS stylesheet for styling the application."""
+    css_path = Path(_STATIC_DIR) / "resonova.css"
+    if css_path.is_file():
+        try:
+            return css_path.read_text(encoding="utf-8")
+        except Exception as e:
+            logger.warning("Failed to load CSS file: %s", e)
+    return CUSTOM_CSS
+
 # ── HTML COMPONENTS ────────────────────────────────────────────────────
 
 HERO_HTML = """
@@ -452,7 +464,7 @@ def run_resonova_pipeline(
                 '<div class="status-box status-idle">⬆️ Upload a video to get started.</div>')
     
     t_start = time.perf_counter()
-    logger.info("[App UI] Starting dubbing pipeline for video='%s'", os.path.basename(video_file))
+    logger.info("[App UI] Starting dubbing pipeline for video='%s' | mock_mode=%s", os.path.basename(video_file), mock_mode)
 
     # ── MOCK MODE (for UI testing only) ──
     if mock_mode:
@@ -499,9 +511,17 @@ def run_resonova_pipeline(
         lang_map = {"Hindi (हिंदी)": "hin_Deva"}
         internal_lang = lang_map.get(target_language, "hin_Deva")
 
+        # Resolve outputs directory in project workspace
+        project_root = Path(__file__).resolve().parents[2]  # resonova/resonova/app/app.py -> resonova/
+        outputs_dir = project_root / "outputs"
+        outputs_dir.mkdir(exist_ok=True)
+
         video_in = Path(video_file).resolve()
-        output_path = str(video_in.parent / f"{video_in.stem}_dubbed{video_in.suffix}")
-        checkpoint_dir = str(video_in.parent / "checkpoints" / video_in.stem)
+        # Sanitize stem: strip and replace spaces with underscores to avoid
+        # path issues in Gradio's temp copy and browser URL parsing
+        video_stem = video_in.stem.strip().replace(" ", "_")
+        output_path = str(outputs_dir / f"{video_stem}_dubbed{video_in.suffix}")
+        checkpoint_dir = str(outputs_dir / "checkpoints" / video_stem)
 
         # Run pipeline
         result = dub_video(
@@ -585,6 +605,11 @@ def run_resonova_pipeline(
             use_lipsync = True
             proc_time = elapsed
 
+        # Validate the file actually exists and is non-empty
+        if not os.path.isfile(dubbed_video_path) or os.path.getsize(dubbed_video_path) == 0:
+            logger.error("[App] Dubbed video file missing or empty: %s", dubbed_video_path)
+            dubbed_video_path = None
+
         lipsync_note = "" if use_lipsync else (
             "<br>⚠️ Lip-sync skipped (Wav2Lip not configured — audio dubbed, original video retained)"
         )
@@ -625,7 +650,7 @@ def build_interface(pipeline_fn=None, for_spaces: bool = False) -> gr.Blocks:
         pipeline_fn = run_resonova_pipeline
         
     with gr.Blocks(
-        css=CUSTOM_CSS,
+        css=_load_css(),
         title="Resonova — AI Video Dubbing",
         theme=gr.themes.Base(
             primary_hue=gr.themes.colors.orange,

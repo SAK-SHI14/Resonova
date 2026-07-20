@@ -124,6 +124,22 @@ def check_pipeline_health() -> dict:
     import os
     wav2lip_repo = os.environ.get("WAV2LIP_REPO_PATH", "")
     wav2lip_chk = os.environ.get("WAV2LIP_CHECKPOINT_PATH", "")
+    
+    # Auto-detect fallback
+    if not wav2lip_repo:
+        from pathlib import Path
+        project_root = Path(__file__).resolve().parents[1]
+        default_repo = project_root / "Wav2Lip"
+        if default_repo.is_dir():
+            wav2lip_repo = str(default_repo.resolve())
+            
+    if not wav2lip_chk and wav2lip_repo:
+        from pathlib import Path
+        default_ckpt = Path(wav2lip_repo) / "checkpoints" / "wav2lip_gan.pth"
+        if default_ckpt.is_file():
+            wav2chk_path = default_ckpt.resolve()
+            wav2lip_chk = str(wav2chk_path)
+
     status["lipsync"] = is_testing or (
         bool(wav2lip_repo) and 
         os.path.exists(wav2lip_repo) and 
@@ -287,13 +303,14 @@ def dub_video(
     if not src_video.is_file():
         raise FileNotFoundError(f"Source video file not found: '{video_path}'")
 
+    video_stem = src_video.stem.strip()
     if output_path is None:
-        output_path = str(src_video.parent / f"{src_video.stem}_dubbed{src_video.suffix}")
+        output_path = str(src_video.parent / f"{video_stem}_dubbed{src_video.suffix}")
     dest_video = Path(output_path).resolve()
     dest_video.parent.mkdir(parents=True, exist_ok=True)
 
     if checkpoint_dir is None:
-        checkpoint_dir = str(dest_video.parent / "checkpoints" / src_video.stem)
+        checkpoint_dir = str(dest_video.parent / "checkpoints" / video_stem)
     ckpt_dir = Path(checkpoint_dir).resolve()
     ckpt_dir.mkdir(parents=True, exist_ok=True)
 
@@ -471,10 +488,14 @@ def dub_video(
         if use_lipsync:
             logger.info("[Pipeline] Running Wav2Lip Lip-Sync...")
             try:
+                import torch
+                rf = 1 if torch.cuda.is_available() else 2
+                logger.info("[Pipeline] Using resize_factor=%d (1=GPU, 2=CPU speedup)", rf)
                 lipsync(
                     video_path=str(src_video),
                     audio_path=str(cloned_audio_synced_path),
                     output_path=str(final_video_temp_path),
+                    resize_factor=rf,
                 )
                 shutil.copy(str(final_video_temp_path), str(dest_video))
                 logger.info("[Pipeline] Lip-Sync complete. Final dubbed video created.")

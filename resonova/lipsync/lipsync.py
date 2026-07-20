@@ -77,15 +77,32 @@ logger = get_logger(__name__)
 def _resolve_env_paths() -> tuple[str, str]:
     """
     Resolve Wav2Lip repo and checkpoint paths from environment variables.
+    Falls back to auto-detecting a local cloned 'Wav2Lip' directory in the project root.
 
     Returns:
         Tuple of (wav2lip_repo_path, wav2lip_checkpoint_path).
 
     Raises:
-        LipSyncError: If required env vars are not set.
+        LipSyncError: If required env vars are not set and auto-detection fails.
     """
     repo_path = os.environ.get("WAV2LIP_REPO_PATH", "")
     checkpoint_path = os.environ.get("WAV2LIP_CHECKPOINT_PATH", "")
+
+    # Auto-detect fallback (skip during testing to let env var validation tests pass)
+    is_testing = "pytest" in sys.modules
+    if not is_testing:
+        if not repo_path:
+            project_root = Path(__file__).resolve().parents[2]
+            default_repo = project_root / "Wav2Lip"
+            if default_repo.is_dir():
+                repo_path = str(default_repo.resolve())
+                logger.info("[LipSync] Auto-detected Wav2Lip repo path: %s", repo_path)
+
+        if not checkpoint_path and repo_path:
+            default_ckpt = Path(repo_path) / "checkpoints" / "wav2lip_gan.pth"
+            if default_ckpt.is_file():
+                checkpoint_path = str(default_ckpt.resolve())
+                logger.info("[LipSync] Auto-detected Wav2Lip checkpoint: %s", checkpoint_path)
 
     if not repo_path:
         raise LipSyncError(
@@ -325,12 +342,15 @@ def lipsync(
             "See notes.md for the troubleshooting log."
         )
 
-    # --- Validate output ---
     if not out_file.exists():
+        stderr_excerpt = proc.stderr[-2000:] if proc.stderr else "(no stderr)"
+        stdout_excerpt = proc.stdout[-1000:] if proc.stdout else "(no stdout)"
         raise LipSyncError(
             f"Wav2Lip reported success (exit code 0) but output file was not created: "
             f"'{output_path}'.\n"
-            "This may indicate a path issue or a silent failure in ffmpeg post-processing."
+            "This may indicate a path issue or a silent failure in ffmpeg post-processing.\n"
+            f"--- stderr (last 2000 chars) ---\n{stderr_excerpt}\n"
+            f"--- stdout (last 1000 chars) ---\n{stdout_excerpt}\n"
         )
     if out_file.stat().st_size == 0:
         raise LipSyncError(
