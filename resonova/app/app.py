@@ -600,14 +600,7 @@ HERO_HTML = """
 """
 
 def get_compute_banner():
-    if IS_GPU:
-        return f"""<div class="banner banner-gpu">
-            ⚡ <strong>GPU Active</strong> — {GPU_NAME} · ~2–4 min per 45-sec clip
-        </div>"""
-    return """<div class="banner banner-cpu">
-        🐢 <strong>CPU Mode</strong> — ~20 min per clip · 
-        Run locally with CUDA GPU for fast inference
-    </div>"""
+    return ""
 
 def get_health_html() -> str:
     """Generate health check HTML from pipeline status."""
