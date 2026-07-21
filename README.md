@@ -25,7 +25,7 @@ short_description: English → Hindi AI dubbing in your own voice, emotion prese
 
   <!-- Badges row -->
   <p>
-    <a href="https://f6e905a659dabe2e6b.gradio.live">
+    <a href="https://0737df54ab8c099319.gradio.live">
       <img src="https://img.shields.io/badge/🤗_Live_Demo-gradio.live-orange?style=for-the-badge" alt="Live Demo"/>
     </a>
     <a href="https://github.com/SAK-SHI14/Resonova">
@@ -48,7 +48,7 @@ short_description: English → Hindi AI dubbing in your own voice, emotion prese
 
 ---
 
-## 🌐 [Try Resonova Live →](https://f6e905a659dabe2e6b.gradio.live)
+## 🌐 [Try Resonova Live →](https://0737df54ab8c099319.gradio.live)
 > Upload a 30–90 second English video. Get back the same person speaking Hindi
 > — in their own cloned voice, with their own emotional delivery preserved.
 
@@ -77,7 +77,7 @@ Resonova specifically resolves this gap by introducing a custom style conditioni
 </tr>
 </table>
 
-> 🔗 **[Watch live demo on Gradio Share](https://f6e905a659dabe2e6b.gradio.live)**
+> 🔗 **[Watch live demo on Gradio Share](https://0737df54ab8c099319.gradio.live)**
 
 ---
 

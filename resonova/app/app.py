@@ -574,7 +574,7 @@ HERO_HTML = """
         </svg>
         <div class="brand-text">
             <div class="brand-title" style="font-family: 'Dancing Script', 'Great Vibes', 'Caveat', cursive !important; font-size: 3.2rem !important; font-weight: 700 !important; color: #C85A32 !important; margin: 0 !important; line-height: 1.1 !important; display: block !important; visibility: visible !important; opacity: 1 !important;">Resonova</div>
-            <p style="margin: 2px 0 0 0; font-size: 0.88rem; color: var(--text-secondary); font-weight: 500;">AI-Powered Video Dubbing · English → Hindi</p>
+            <p style="margin: 2px 0 0 0; font-size: 0.88rem; color: var(--text-secondary); font-weight: 500;">Speak once. Understood everywhere</p>
         </div>
     </div>
     <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" aria-label="Toggle Dark/Light Theme">
