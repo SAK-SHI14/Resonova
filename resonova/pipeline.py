@@ -150,7 +150,9 @@ def check_pipeline_health() -> dict:
 
 
 def merge_audio_video(video_path: str, audio_path: str, output_path: str) -> str:
-    """Merge dubbed audio with original video (no lip re-sync)."""
+    """Merge dubbed audio with original video (no lip re-sync).
+    Uses -async 1 to resample audio timestamps and eliminate A/V drift.
+    """
     cmd = [
         "ffmpeg", "-y",
         "-i", video_path,
@@ -159,6 +161,7 @@ def merge_audio_video(video_path: str, audio_path: str, output_path: str) -> str
         "-c:a", "aac", "-b:a", "192k",
         "-map", "0:v:0",
         "-map", "1:a:0",
+        "-async", "1",        # Resample audio to fix A/V drift
         "-shortest",
         output_path
     ]
@@ -223,41 +226,122 @@ def extract_audio_from_video(video_path: str, audio_path: str) -> None:
 def time_stretch_audio(input_path: str, output_path: str, ratio: float) -> None:
     """
     Time-stretch or compress audio using ffmpeg's atempo filter.
-    Handles arbitrary ratios by chaining filters if ratio is outside [0.5, 2.0].
+    - For ratios near 1.0 (within 0.1%), copies the file directly.
+    - For ratios in the natural range [0.65, 1.5], uses atempo for smooth time-stretching.
+    - For extreme ratios outside [0.65, 1.5], uses silence-padding (if audio is shorter
+      than expected) or fade-trimming (if audio is too long) instead of distorting atempo.
+      This avoids chipmunk/slow-motion distortion on large duration mismatches.
     """
     if abs(ratio - 1.0) < 0.001:
         logger.info("[Pipeline] Time-stretch ratio is ~1.0. Copying file directly.")
         shutil.copy(input_path, output_path)
         return
 
-    filters = []
-    temp_ratio = ratio
-    while temp_ratio > 2.0:
-        filters.append("atempo=2.0")
-        temp_ratio /= 2.0
-    while temp_ratio < 0.5:
-        filters.append("atempo=0.5")
-        temp_ratio /= 0.5
-    if temp_ratio != 1.0:
-        filters.append(f"atempo={temp_ratio:.4f}")
+    # Clamp extreme ratios: beyond this range atempo sounds distorted
+    NATURAL_MIN = 0.65
+    NATURAL_MAX = 1.50
 
-    filter_str = ",".join(filters)
+    if NATURAL_MIN <= ratio <= NATURAL_MAX:
+        # Natural range: use atempo directly
+        filters = []
+        temp_ratio = ratio
+        # Chain atempo if still outside [0.5, 2.0] (edge cases near boundary)
+        while temp_ratio > 2.0:
+            filters.append("atempo=2.0")
+            temp_ratio /= 2.0
+        while temp_ratio < 0.5:
+            filters.append("atempo=0.5")
+            temp_ratio /= 0.5
+        if abs(temp_ratio - 1.0) > 0.001:
+            filters.append(f"atempo={temp_ratio:.4f}")
+
+        filter_str = ",".join(filters)
+        cmd = [
+            "ffmpeg", "-y",
+            "-i", input_path,
+            "-filter:a", filter_str,
+            output_path,
+            "-loglevel", "error",
+        ]
+        logger.info("[Pipeline] Time-stretching audio (atempo): ratio=%.4f (filter='%s')", ratio, filter_str)
+
+        try:
+            subprocess.run(cmd, capture_output=True, text=True, check=True)
+        except subprocess.CalledProcessError as exc:
+            raise ValueError(
+                f"ffmpeg atempo filter failed: {exc.stderr}"
+            ) from exc
+
+    elif ratio < NATURAL_MIN:
+        # Audio is much longer than video — trim to fit with a short crossfade at the end
+        logger.warning(
+            "[Pipeline] Speed ratio %.2f < %.2f: audio much longer than video. "
+            "Trimming audio with crossfade to avoid distortion.",
+            ratio, NATURAL_MIN
+        )
+        # Compute target duration (audio_duration * ratio ~= video_duration)
+        # We trim to the video length using atrim + afade
+        target_duration_s = _get_duration_seconds(input_path) * ratio
+        fade_duration = min(1.0, target_duration_s * 0.05)  # 5% fade, max 1s
+        cmd = [
+            "ffmpeg", "-y",
+            "-i", input_path,
+            "-filter:a", (
+                f"atrim=0:{target_duration_s:.3f},"
+                f"afade=t=out:st={max(0.0, target_duration_s - fade_duration):.3f}:d={fade_duration:.3f}"
+            ),
+            output_path,
+            "-loglevel", "error",
+        ]
+        try:
+            subprocess.run(cmd, capture_output=True, text=True, check=True)
+        except subprocess.CalledProcessError as exc:
+            # Fall back to direct copy if trimming fails
+            logger.warning("[Pipeline] Trim failed (%s). Copying audio as-is.", exc.stderr)
+            shutil.copy(input_path, output_path)
+
+    else:
+        # ratio > NATURAL_MAX: audio is much shorter than video — pad with silence at end
+        logger.warning(
+            "[Pipeline] Speed ratio %.2f > %.2f: audio shorter than video. "
+            "Padding with silence instead of extreme speed-up.",
+            ratio, NATURAL_MAX
+        )
+        audio_duration = _get_duration_seconds(input_path)
+        target_duration_s = audio_duration * ratio  # = video duration
+        pad_duration = target_duration_s - audio_duration
+        cmd = [
+            "ffmpeg", "-y",
+            "-i", input_path,
+            "-filter_complex",
+            (
+                f"[0:a]apad=pad_dur={pad_duration:.3f}[padded];"
+                f"[padded]atrim=0:{target_duration_s:.3f}[out]"
+            ),
+            "-map", "[out]",
+            output_path,
+            "-loglevel", "error",
+        ]
+        try:
+            subprocess.run(cmd, capture_output=True, text=True, check=True)
+        except subprocess.CalledProcessError as exc:
+            logger.warning("[Pipeline] Silence padding failed (%s). Copying audio as-is.", exc.stderr)
+            shutil.copy(input_path, output_path)
+
+
+def _get_duration_seconds(path: str) -> float:
+    """Return duration of an audio/video file in seconds using FFprobe."""
     cmd = [
-        "ffmpeg",
-        "-i", input_path,
-        "-filter:a", filter_str,
-        output_path,
-        "-y",
-        "-loglevel", "error",
+        "ffprobe", "-v", "error",
+        "-show_entries", "format=duration",
+        "-of", "default=noprint_wrappers=1:nokey=1",
+        path
     ]
-    logger.info("[Pipeline] Time-stretching audio: ratio=%.4f (filter_str='%s')", ratio, filter_str)
-
     try:
-        subprocess.run(cmd, capture_output=True, text=True, check=True)
-    except subprocess.CalledProcessError as exc:
-        raise ValueError(
-            f"ffmpeg atempo filter failed: {exc.stderr}"
-        ) from exc
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return float(result.stdout.strip())
+    except Exception:
+        return 0.0
 
 
 def unload_all_models() -> None:

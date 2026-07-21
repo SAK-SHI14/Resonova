@@ -266,39 +266,92 @@ def clone_voice(
             ) from exc
 
     if use_gtts:
+        import asyncio
+        import tempfile
+
+        # Map language code to edge-tts voice (neural, natural quality)
+        EDGE_TTS_VOICES = {
+            "hi": "hi-IN-SwaraNeural",    # Natural Hindi female voice (Microsoft neural)
+            "en": "en-US-JennyNeural",
+            "es": "es-ES-ElviraNeural",
+            "fr": "fr-FR-DeniseNeural",
+            "de": "de-DE-KatjaNeural",
+        }
+        lang_key = "hi" if "hi" in language.lower() else language.split("_")[0]
+        edge_voice = EDGE_TTS_VOICES.get(lang_key, f"{lang_key}-Wavenet-A")
+
+        edge_success = False
         try:
-            from gtts import gTTS  # noqa: PLC0415
-            import tempfile
-            
-            # gTTS generates MP3 data
+            import edge_tts  # noqa: PLC0415
+
             temp_mp3 = tempfile.mktemp(suffix=".mp3")
-            # Map full target_lang to language code for gtts (e.g. "hin_Deva" -> "hi")
-            gtts_lang = "hi" if "hi" in language.lower() else language.split("_")[0]
-            tts_gtts = gTTS(text=text, lang=gtts_lang)
-            tts_gtts.save(temp_mp3)
-            
-            # Convert MP3 to target output WAV via ffmpeg
+
+            async def _run_edge_tts():
+                communicate = edge_tts.Communicate(text=text, voice=edge_voice)
+                await communicate.save(temp_mp3)
+
+            asyncio.run(_run_edge_tts())
+
+            # Convert MP3 → WAV via FFmpeg
             cmd = [
                 "ffmpeg", "-y",
                 "-i", temp_mp3,
                 "-acodec", "pcm_s16le",
-                "-ar", "16000",
+                "-ar", "22050",  # higher sample rate for better quality
                 "-ac", "1",
                 str(out_path)
             ]
             subprocess.run(cmd, check=True, capture_output=True)
-            
-            # Cleanup temp file
+
             try:
                 os.remove(temp_mp3)
             except Exception:
                 pass
-                
-            logger.info("[VoiceCloning] gTTS fallback successful. Generated audio at '%s'.", out_path)
-        except Exception as fallback_exc:
-            raise VoiceCloningError(
-                f"Both XTTS-v2 and gTTS fallback failed. gTTS Error: {fallback_exc}"
-            ) from fallback_exc
+
+            logger.info(
+                "[VoiceCloning] edge-tts neural voice synthesis successful | voice='%s' | out='%s'",
+                edge_voice, out_path
+            )
+            edge_success = True
+
+        except Exception as edge_exc:
+            logger.warning(
+                "[VoiceCloning] edge-tts failed (%s). Falling back to gTTS (lower quality)...",
+                edge_exc
+            )
+
+        if not edge_success:
+            # Final fallback: gTTS
+            try:
+                from gtts import gTTS  # noqa: PLC0415
+
+                temp_mp3 = tempfile.mktemp(suffix=".mp3")
+                gtts_lang = "hi" if "hi" in language.lower() else language.split("_")[0]
+                tts_gtts = gTTS(text=text, lang=gtts_lang)
+                tts_gtts.save(temp_mp3)
+
+                cmd = [
+                    "ffmpeg", "-y",
+                    "-i", temp_mp3,
+                    "-acodec", "pcm_s16le",
+                    "-ar", "16000",
+                    "-ac", "1",
+                    str(out_path)
+                ]
+                subprocess.run(cmd, check=True, capture_output=True)
+
+                try:
+                    os.remove(temp_mp3)
+                except Exception:
+                    pass
+
+                logger.info("[VoiceCloning] gTTS fallback successful. Generated audio at '%s'.", out_path)
+
+            except Exception as fallback_exc:
+                raise VoiceCloningError(
+                    f"All TTS backends failed. Last error (gTTS): {fallback_exc}"
+                ) from fallback_exc
+
 
     # --- Validate output ---
     if not out_path.exists() or out_path.stat().st_size == 0:

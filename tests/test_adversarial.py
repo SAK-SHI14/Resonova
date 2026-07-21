@@ -340,36 +340,44 @@ class TestEdgeCaseInputs:
 class TestSystemBoundaries:
     """Tests that verify architectural constraints are enforced correctly."""
 
-    # ── Test 9: Extreme duration ratio — atempo chaining ─────────────────────
+    # ── Test 9: Extreme duration ratio — smart padding/trimming ──────────────
 
     @patch("subprocess.run")
     def test_extreme_duration_ratio_atempo_chain(self, mock_run: MagicMock):
         """
-        PASS: A duration ratio of 4.5x (Hindi much longer than English) exceeds
-        FFmpeg's atempo limit of [0.5, 2.0]. time_stretch_audio() must chain
-        multiple atempo filters and not crash.
+        PASS: A duration ratio outside the natural range [0.65, 1.5] now uses
+        smart padding (silence pad for ratio > 1.5) or trimming (fade-trim for
+        ratio < 0.65) instead of distorted extreme atempo chaining.
 
-        Expected filter string for 4.5: atempo=2.0,atempo=2.0,atempo=1.1250
-        Expected filter string for 0.15: atempo=0.5,atempo=0.5,atempo=0.6000
+        This prevents chipmunk/slowed-down distortion on large duration mismatches.
 
-        Result: PASS ✅ — chaining logic is implemented in pipeline.py.
+        Result: PASS ✅ — smart sync strategy implemented in pipeline.py.
         """
         mock_run.return_value = MagicMock(returncode=0)
 
-        # Ratio = 4.5 (way above 2.0)
+        # Ratio = 4.5 (way above 1.5 — audio shorter than video)
+        # Should use silence-padding (apad) instead of atempo chaining
         time_stretch_audio("in.wav", "out.wav", 4.5)
         cmd_high = mock_run.call_args[0][0]
-        filter_idx = cmd_high.index("-filter:a")
-        assert cmd_high[filter_idx + 1] == "atempo=2.0,atempo=2.0,atempo=1.1250", (
-            "atempo=2.0,atempo=2.0,atempo=1.1250 expected for ratio=4.5"
+        # New behavior: uses -filter_complex with apad, NOT -filter:a with atempo
+        assert "-filter_complex" in cmd_high, (
+            "Ratio 4.5 should use silence-padding (-filter_complex with apad), not atempo"
+        )
+        assert any("apad" in str(arg) for arg in cmd_high), (
+            "Expected 'apad' in ffmpeg args for ratio=4.5 (silence padding)"
         )
 
-        # Ratio = 0.15 (way below 0.5)
+        # Ratio = 0.15 (way below 0.65 — audio much longer than video)
+        # Should use fade-trim (atrim + afade) instead of atempo chaining
         time_stretch_audio("in.wav", "out.wav", 0.15)
         cmd_low = mock_run.call_args[0][0]
-        filter_idx = cmd_low.index("-filter:a")
-        assert cmd_low[filter_idx + 1] == "atempo=0.5,atempo=0.5,atempo=0.6000", (
-            "atempo=0.5,atempo=0.5,atempo=0.6000 expected for ratio=0.15"
+        # New behavior: uses -filter:a with atrim+afade, NOT chained atempo
+        assert "-filter:a" in cmd_low, (
+            "Ratio 0.15 should use atrim+afade trimming (-filter:a)"
+        )
+        filter_val = cmd_low[cmd_low.index("-filter:a") + 1]
+        assert "atrim" in filter_val, (
+            f"Expected 'atrim' in filter for ratio=0.15, got: {filter_val}"
         )
 
     # ── Test 10: Checkpoint resumption after mid-pipeline failure ─────────────

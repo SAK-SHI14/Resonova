@@ -78,7 +78,7 @@ class TestPipeline:
         def fake_clone(*args, **kwargs):
             (ckpt_dir / "cloned_audio_raw.wav").write_bytes(b"\x00" * 100)
 
-        def fake_lipsync(video_path, audio_path, output_path):
+        def fake_lipsync(video_path, audio_path, output_path, **kwargs):
             Path(output_path).write_bytes(b"\x00" * 200)
 
         mock_subcomponents["clone_voice"].side_effect = fake_clone
@@ -125,7 +125,7 @@ class TestPipeline:
         def fake_clone(*args, **kwargs):
             (ckpt_dir / "cloned_audio_raw.wav").write_bytes(b"\x00" * 100)
 
-        def fake_lipsync(video_path, audio_path, output_path):
+        def fake_lipsync(video_path, audio_path, output_path, **kwargs):
             Path(output_path).write_bytes(b"\x00" * 200)
 
         mock_subcomponents["clone_voice"].side_effect = fake_clone
@@ -159,7 +159,7 @@ class TestPipeline:
         def fake_clone(*args, **kwargs):
             (ckpt_dir / "cloned_audio_raw.wav").write_bytes(b"\x00" * 100)
 
-        def fake_lipsync(video_path, audio_path, output_path):
+        def fake_lipsync(video_path, audio_path, output_path, **kwargs):
             Path(output_path).write_bytes(b"\x00" * 200)
 
         mock_subcomponents["clone_voice"].side_effect = fake_clone
@@ -179,22 +179,30 @@ class TestPipeline:
 
     @patch("subprocess.run")
     def test_time_stretch_audio_chains_atempo_for_large_ratios(self, mock_run):
-        """time_stretch_audio must chain atempo filters in ffmpeg if ratio > 2.0 or < 0.5."""
+        """For extreme ratios outside [0.65, 1.5], time_stretch_audio uses smart
+        padding/trimming instead of distorted extreme atempo chaining."""
         mock_run.return_value = MagicMock(returncode=0)
 
-        # Test ratio = 4.5 (> 2.0)
+        # Test ratio = 4.5 (> 1.5 threshold) — should use silence-padding
         time_stretch_audio("in.wav", "out.wav", 4.5)
-        # Expected: atempo=2.0,atempo=2.0,atempo=1.1250 (4.5 / 2.0 / 2.0 = 1.125)
-        args_ratio_high = mock_run.call_args[0][0]
-        filter_idx = args_ratio_high.index("-filter:a")
-        assert args_ratio_high[filter_idx + 1] == "atempo=2.0,atempo=2.0,atempo=1.1250"
+        cmd_high = mock_run.call_args[0][0]
+        assert "-filter_complex" in cmd_high, (
+            "Ratio 4.5 should use silence padding (-filter_complex with apad)"
+        )
+        assert any("apad" in str(arg) for arg in cmd_high), (
+            "Expected 'apad' in ffmpeg args for ratio=4.5"
+        )
 
-        # Test ratio = 0.15 (< 0.5)
+        # Test ratio = 0.15 (< 0.65 threshold) — should use fade-trim
         time_stretch_audio("in.wav", "out.wav", 0.15)
-        # Expected: atempo=0.5,atempo=0.5,atempo=0.6000 (0.15 / 0.5 / 0.5 = 0.6)
-        args_ratio_low = mock_run.call_args[0][0]
-        filter_idx = args_ratio_low.index("-filter:a")
-        assert args_ratio_low[filter_idx + 1] == "atempo=0.5,atempo=0.5,atempo=0.6000"
+        cmd_low = mock_run.call_args[0][0]
+        assert "-filter:a" in cmd_low, (
+            "Ratio 0.15 should use atrim+afade trimming"
+        )
+        filter_val = cmd_low[cmd_low.index("-filter:a") + 1]
+        assert "atrim" in filter_val, (
+            f"Expected 'atrim' in filter for ratio=0.15, got: {filter_val}"
+        )
 
     @patch("shutil.copy")
     def test_time_stretch_audio_copies_file_directly_for_unit_ratio(self, mock_copy):

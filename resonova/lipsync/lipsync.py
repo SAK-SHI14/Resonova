@@ -239,6 +239,26 @@ def lipsync(
     _validate_video(video_file)
     _validate_audio(audio_file)
 
+    # --- Detect actual video FPS ---
+    # Read FPS from the video file and pass it explicitly to inference.py.
+    # This ensures the correct FPS is available as a fallback even if
+    # OpenCV inside inference.py returns 0 (missing metadata).
+    try:
+        import cv2  # noqa: PLC0415
+        cap = cv2.VideoCapture(str(video_file))
+        detected_fps = cap.get(cv2.CAP_PROP_FPS)
+        cap.release()
+        if detected_fps and detected_fps > 0:
+            fps = detected_fps
+            logger.info("[LipSync] Detected video FPS=%.2f", fps)
+        else:
+            logger.warning(
+                "[LipSync] Could not detect video FPS (got %.2f). Using default %.2f.",
+                detected_fps, fps
+            )
+    except Exception as fps_exc:
+        logger.warning("[LipSync] FPS detection failed (%s). Using default %.2f.", fps_exc, fps)
+
     # --- Resolve Wav2Lip paths ---
     if wav2lip_repo_path is None or checkpoint_path is None:
         _repo, _ckpt = _resolve_env_paths()
@@ -257,8 +277,8 @@ def lipsync(
     out_file.parent.mkdir(parents=True, exist_ok=True)
 
     logger.info(
-        "[LipSync] Starting | video='%s' | audio='%s' | out='%s'",
-        video_file.name, audio_file.name, out_file.name,
+        "[LipSync] Starting | video='%s' | audio='%s' | out='%s' | fps=%.2f",
+        video_file.name, audio_file.name, out_file.name, fps,
     )
     t_start = time.perf_counter()
 
