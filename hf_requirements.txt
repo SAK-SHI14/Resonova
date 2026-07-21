@@ -30,6 +30,10 @@ indic-nlp-library>=0.91
 # NOTE: original 'TTS' package requires Python <3.12 (unmaintained).
 # 'coqui-tts' is the Python 3.12 compatible community fork with identical API.
 coqui-tts
+# TTS fallback chain (used if coqui-tts unavailable):
+edge-tts>=6.1.9            # Microsoft Edge neural TTS (hi-IN-SwaraNeural — natural quality)
+gTTS>=2.3.1                # Google TTS — final fallback
+
 
 # ----- Prosody / Audio -----
 librosa>=0.10.0
