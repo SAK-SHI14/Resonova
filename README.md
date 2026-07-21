@@ -25,8 +25,8 @@ short_description: English → Hindi AI dubbing in your own voice, emotion prese
 
   <!-- Badges row -->
   <p>
-    <a href="https://huggingface.co/spaces/SAK-SHI14/resonova-dubbing">
-      <img src="https://img.shields.io/badge/🤗_HuggingFace-Live_Demo-orange?style=for-the-badge" alt="Live Demo"/>
+    <a href="https://6870b3c0de72ecd08e.gradio.live">
+      <img src="https://img.shields.io/badge/🤗_Live_Demo-gradio.live-orange?style=for-the-badge" alt="Live Demo"/>
     </a>
     <a href="https://github.com/SAK-SHI14/Resonova">
       <img src="https://img.shields.io/badge/GitHub-Resonova-181717?style=for-the-badge&logo=github" alt="GitHub"/>
@@ -48,7 +48,7 @@ short_description: English → Hindi AI dubbing in your own voice, emotion prese
 
 ---
 
-## 🌐 [Try Resonova Live →](https://huggingface.co/spaces/SAK-SHI14/resonova-dubbing)
+## 🌐 [Try Resonova Live →](https://6870b3c0de72ecd08e.gradio.live)
 > Upload a 30–90 second English video. Get back the same person speaking Hindi
 > — in their own cloned voice, with their own emotional delivery preserved.
 
@@ -77,7 +77,7 @@ Resonova specifically resolves this gap by introducing a custom style conditioni
 </tr>
 </table>
 
-> 🔗 **[Watch live demo on HuggingFace Spaces](https://huggingface.co/spaces/SAK-SHI14/resonova-dubbing)**
+> 🔗 **[Watch live demo on Gradio Share](https://6870b3c0de72ecd08e.gradio.live)**
 
 ---
 
@@ -152,11 +152,11 @@ These features are passed as a style reference to XTTS-v2, then post-synthesis R
 
 ## 🚀 Quick Start
 
-### Option 1: HuggingFace Spaces (no setup required)
+### Option 1: Live Gradio Link (no setup required)
 
-**[Try Resonova live on HuggingFace Spaces →](https://huggingface.co/spaces/SAK-SHI14/resonova-dubbing)**
+**[Try Resonova live on Gradio Share →](https://6870b3c0de72ecd08e.gradio.live)**
 
-Expected processing duration: ~2–4 minutes per 45-second clip on ZeroGPU (A10G).
+Expected processing duration: ~15-30 minutes per 30-second clip on CPU mode (free). Turn on Demo Mode checkbox for instant results.
 
 ### Option 2: Docker (local GPU)
 
