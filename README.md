@@ -277,19 +277,6 @@ The ablation study is the scientific proof that the conditioning layer specifica
 | [`docs/adrs/`](docs/adrs/) | 6 Architecture Decision Records |
 | [`notes.md`](notes.md) | Living dependency troubleshooting log |
 
----
-
-## 🚢 Deploy Your Own
-
-```bash
-# Fork this repo, then:
-git remote add spaces https://huggingface.co/spaces/YOUR_USERNAME/resonova-dubbing
-git push spaces main
-# Space auto-detects app_file from the YAML header in README.md
-# Build takes ~5 minutes; requires packages.txt + hf_requirements.txt
-```
-
----
 
 ## 👩‍💻 About
 
