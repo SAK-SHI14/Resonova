@@ -107,12 +107,18 @@ def main() -> None:
     outputs_dir.mkdir(exist_ok=True)
     allowed.append(str(outputs_dir.resolve()))
 
+    # Check if share mode requested (env var or default True for easy sharing)
+    share_mode = os.environ.get("GRADIO_SHARE", "true").lower() == "true"
+    if share_mode:
+        logger.info("Share mode ON — a public gradio.live URL will be printed below.")
+
     demo.launch(
         server_name=server_name,
         server_port=server_port,
         show_error=True,
         quiet=False,  # Show Gradio startup logs
         allowed_paths=allowed,
+        share=share_mode,   # Creates free public URL: https://xxxx.gradio.live
         theme=gr.themes.Base(
             primary_hue=gr.themes.colors.orange,
             neutral_hue=gr.themes.colors.gray,

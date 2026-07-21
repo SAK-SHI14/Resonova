@@ -14,8 +14,8 @@ license: mit
 
 **English → Hindi video dubbing in your own voice, with emotion preserved.**
 
-[![HuggingFace Spaces](https://img.shields.io/badge/🤗-Live%20Demo-blue)](https://huggingface.co/spaces/SAK-SHI14/resonova-dubbing)
-[![Tests](https://img.shields.io/badge/tests-75%2B%20passing-brightgreen)]()
+[![Live Demo](https://img.shields.io/badge/🤗-Live%20Demo-blue)](https://6f508b9880e5b95075.gradio.live)
+[![Tests](https://img.shields.io/badge/tests-83--passing-brightgreen)]()
 [![ADRs](https://img.shields.io/badge/ADRs-6%20documented-blue)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -30,7 +30,7 @@ emotional delivery preserved.
 Upload a 30–90 second clip; get back the same person, the same energy, a different language.
 
 It runs entirely on open-weight models (Whisper, IndicTrans2, XTTS-v2, Wav2Lip),
-fits on a free-tier T4 GPU, and is deployable with a single `docker compose up`.
+supports **Microsoft Edge Neural TTS** fallback for natural-sounding voices, and implements **smart duration padding/trimming** for distortion-free audio sync.
 
 ---
 
@@ -43,7 +43,7 @@ fits on a free-tier T4 GPU, and is deployable with a single `docker compose up`.
 | **Translation BLEU** (FLORES-200, n=100) | **0.5120** | Published baseline 0.4930 ✅ +0.019 |
 | **Translation chrF** (FLORES-200, n=100) | **0.6800** | Target: ≥ 0.6500 ✅ |
 | **Ablation SER Improvement** | **+40pp** | Conditioning ON vs. OFF |
-| **Tests Passing** | **75+** (0 failures) | 16 adversarial + 59 unit |
+| **Tests Passing** | **83** (0 failures) | All adversarial and environment unit tests passing ✅ |
 | **ADRs Written** | **6** | Full decision documentation |
 
 > The +40pp ablation SER improvement is the most important result — it proves
@@ -53,9 +53,17 @@ fits on a free-tier T4 GPU, and is deployable with a single `docker compose up`.
 
 ## How to Run
 
-### 🌐 Option 1: HuggingFace Spaces (no setup)
+### 🌐 Option 1: Live Verification Link (No Setup)
 
-**[Try Resonova live →](https://huggingface.co/spaces/SAK-SHI14/resonova-dubbing)**
+**[Try Resonova live on Gradio Share →](https://6f508b9880e5b95075.gradio.live)**
+
+*Note: This link is hosted directly from local execution via Gradio tunneling. Check the Demo Mode option for instant UI verification.*
+
+---
+
+### 🌐 Option 2: HuggingFace Spaces (Production)
+
+**[Production HuggingFace Space →](https://huggingface.co/spaces/SAK-SHI14/resonova-dubbing)**
 
 ZeroGPU mode: ~2–4 min per 45-second clip (GPU) or ~20 min (CPU fallback).
 The UI tells you which mode is active before you submit.
