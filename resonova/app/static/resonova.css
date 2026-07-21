@@ -1,33 +1,38 @@
 /* ═══════════════════════════════════════════════════
-   RESONOVA — AESTHETIC BEIGE & PASTEL DESIGN SYSTEM v6
-   Design: Aesthetic Beige, Soft Pastels, Handwritten Title, Working Event-Delegated Dark Mode Toggle
+   RESONOVA — AESTHETIC BEIGE & PASTEL DESIGN SYSTEM v7
+   Design: Light Beige (Default) & Dark Espresso (On Toggle)
    ═══════════════════════════════════════════════════ */
 
 @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Great+Vibes&family=Caveat:wght@700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
-/* ── COLOR SYSTEM & THEME TOKENS ── */
-:root {
-  /* Aesthetic Beige & Pastel Light Theme */
-  --bg-app: #FDFBF7;
-  --bg-card: #FFFFFF;
-  --bg-subtle: #F6F1EA;
-  --bg-accent-soft: #FCEFE6;
-  --border-color: #E6DCCF;
-  --border-focus: #E07A5F;
+/* ── LIGHT THEME (DEFAULT / EXPLICIT) ── */
+:root,
+html,
+body,
+.gradio-container,
+html[data-theme="light"],
+body[data-theme="light"],
+.gradio-container[data-theme="light"] {
+  --bg-app: #FDFBF7 !important;
+  --bg-card: #FFFFFF !important;
+  --bg-subtle: #F6F1EA !important;
+  --bg-accent-soft: #FCEFE6 !important;
+  --border-color: #E6DCCF !important;
+  --border-focus: #E07A5F !important;
 
-  --text-primary: #3D342F;
-  --text-secondary: #6E635B;
-  --text-muted: #9E9289;
-  --text-accent: #C85A32;
+  --text-primary: #3D342F !important;
+  --text-secondary: #6E635B !important;
+  --text-muted: #9E9289 !important;
+  --text-accent: #C85A32 !important;
 
-  --accent-primary: #E07A5F;
-  --accent-hover: #C85A32;
-  --accent-gradient: linear-gradient(135deg, #E07A5F 0%, #F4A261 100%);
-  --accent-gradient-hover: linear-gradient(135deg, #C85A32 0%, #E07A5F 100%);
-  --accent-shadow: 0 6px 18px -3px rgba(224, 122, 95, 0.35);
+  --accent-primary: #E07A5F !important;
+  --accent-hover: #C85A32 !important;
+  --accent-gradient: linear-gradient(135deg, #E07A5F 0%, #F4A261 100%) !important;
+  --accent-gradient-hover: linear-gradient(135deg, #C85A32 0%, #E07A5F 100%) !important;
+  --accent-shadow: 0 6px 18px -3px rgba(224, 122, 95, 0.35) !important;
 
-  --shadow-card: 0 4px 15px rgba(61, 52, 47, 0.04);
-  --shadow-hover: 0 8px 24px rgba(61, 52, 47, 0.08);
+  --shadow-card: 0 4px 15px rgba(61, 52, 47, 0.04) !important;
+  --shadow-hover: 0 8px 24px rgba(61, 52, 47, 0.08) !important;
 
   --radius-sm: 10px;
   --radius-md: 14px;
@@ -51,31 +56,30 @@
   --button-primary-text-color: #FFFFFF !important;
 }
 
-[data-theme="dark"],
-.dark,
-body.dark,
+/* ── DARK THEME (ONLY WHEN EXPLICITLY TOGGLED) ── */
+html[data-theme="dark"],
+body[data-theme="dark"],
 .gradio-container[data-theme="dark"] {
-  /* Aesthetic Dark Espresso Theme */
-  --bg-app: #1C1917;
-  --bg-card: #262322;
-  --bg-subtle: #332F2C;
-  --bg-accent-soft: rgba(244, 162, 97, 0.15);
-  --border-color: #443E3A;
-  --border-focus: #F4A261;
+  --bg-app: #1C1917 !important;
+  --bg-card: #262322 !important;
+  --bg-subtle: #332F2C !important;
+  --bg-accent-soft: rgba(244, 162, 97, 0.15) !important;
+  --border-color: #443E3A !important;
+  --border-focus: #F4A261 !important;
 
-  --text-primary: #F5EFEB;
-  --text-secondary: #D6CCC2;
-  --text-muted: #A89F95;
-  --text-accent: #F4A261;
+  --text-primary: #F5EFEB !important;
+  --text-secondary: #D6CCC2 !important;
+  --text-muted: #A89F95 !important;
+  --text-accent: #F4A261 !important;
 
-  --accent-primary: #F4A261;
-  --accent-hover: #E07A5F;
-  --accent-gradient: linear-gradient(135deg, #E07A5F 0%, #F4A261 100%);
-  --accent-gradient-hover: linear-gradient(135deg, #C85A32 0%, #E07A5F 100%);
-  --accent-shadow: 0 6px 20px -3px rgba(244, 162, 97, 0.3);
+  --accent-primary: #F4A261 !important;
+  --accent-hover: #E07A5F !important;
+  --accent-gradient: linear-gradient(135deg, #E07A5F 0%, #F4A261 100%) !important;
+  --accent-gradient-hover: linear-gradient(135deg, #C85A32 0%, #E07A5F 100%) !important;
+  --accent-shadow: 0 6px 20px -3px rgba(244, 162, 97, 0.3) !important;
 
-  --shadow-card: 0 4px 15px rgba(0, 0, 0, 0.4);
-  --shadow-hover: 0 10px 24px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 4px 15px rgba(0, 0, 0, 0.4) !important;
+  --shadow-hover: 0 10px 24px rgba(0, 0, 0, 0.5) !important;
 
   /* Gradio Native Overrides (Dark Espresso) */
   --background-fill-primary: #262322 !important;
@@ -168,7 +172,9 @@ div.block, div.form, div.panel,
   text-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-[data-theme="dark"] .brand-title {
+html[data-theme="dark"] .brand-title,
+body[data-theme="dark"] .brand-title,
+.gradio-container[data-theme="dark"] .brand-title {
   color: #F4A261 !important;
 }
 
@@ -474,7 +480,9 @@ button.secondary:hover {
   border: 1px solid rgba(245, 158, 11, 0.4) !important;
   color: #D97706 !important;
 }
-[data-theme="dark"] .status-running {
+html[data-theme="dark"] .status-running,
+body[data-theme="dark"] .status-running,
+.gradio-container[data-theme="dark"] .status-running {
   color: #FBBF24 !important;
 }
 
@@ -483,7 +491,9 @@ button.secondary:hover {
   border: 1px solid rgba(16, 185, 129, 0.4) !important;
   color: #059669 !important;
 }
-[data-theme="dark"] .status-done {
+html[data-theme="dark"] .status-done,
+body[data-theme="dark"] .status-done,
+.gradio-container[data-theme="dark"] .status-done {
   color: #34D399 !important;
 }
 
@@ -492,7 +502,9 @@ button.secondary:hover {
   border: 1px solid rgba(239, 68, 68, 0.4) !important;
   color: #DC2626 !important;
 }
-[data-theme="dark"] .status-error {
+html[data-theme="dark"] .status-error,
+body[data-theme="dark"] .status-error,
+.gradio-container[data-theme="dark"] .status-error {
   color: #F87171 !important;
 }
 

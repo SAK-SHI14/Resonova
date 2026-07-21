@@ -605,17 +605,31 @@ HERO_HTML = """
 
 <script>
 (function() {
-    function doToggle() {
+    function applyTheme(next) {
         var h = document.documentElement;
         var b = document.body;
-        var curr = h.getAttribute('data-theme') || b.getAttribute('data-theme') || 'light';
-        var next = (curr === 'dark') ? 'light' : 'dark';
         
         h.setAttribute('data-theme', next);
         b.setAttribute('data-theme', next);
-        document.querySelectorAll('.gradio-container').forEach(function(c) {
+        
+        if (next === 'light') {
+            h.classList.remove('dark');
+            b.classList.remove('dark');
+        } else {
+            h.classList.add('dark');
+            b.classList.add('dark');
+        }
+
+        var cs = document.querySelectorAll('.gradio-container');
+        cs.forEach(function(c) {
             c.setAttribute('data-theme', next);
+            if (next === 'light') {
+                c.classList.remove('dark');
+            } else {
+                c.classList.add('dark');
+            }
         });
+
         try { localStorage.setItem('resonova-theme', next); } catch(e){}
         
         var iconSun = document.getElementById('theme-icon-sun');
@@ -632,6 +646,13 @@ HERO_HTML = """
         }
     }
 
+    function doToggle() {
+        var h = document.documentElement;
+        var curr = h.getAttribute('data-theme') || 'light';
+        var next = (curr === 'dark') ? 'light' : 'dark';
+        applyTheme(next);
+    }
+
     window.toggleResonovaTheme = doToggle;
 
     document.addEventListener('click', function(e) {
@@ -643,17 +664,11 @@ HERO_HTML = """
         }
     }, true);
 
-    var saved = localStorage.getItem('resonova-theme') || 
-        (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    
-    document.documentElement.setAttribute('data-theme', saved);
-    document.body.setAttribute('data-theme', saved);
+    var saved = localStorage.getItem('resonova-theme') || 'light';
+    applyTheme(saved);
     
     [50, 200, 500, 1000].forEach(function(delay) {
-        setTimeout(function() {
-            var cs = document.querySelectorAll('.gradio-container');
-            cs.forEach(function(c) { c.setAttribute('data-theme', saved); });
-        }, delay);
+        setTimeout(function() { applyTheme(saved); }, delay);
     });
 })();
 </script>
