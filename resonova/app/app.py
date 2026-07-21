@@ -558,66 +558,6 @@ def _load_css() -> str:
 # ── HTML COMPONENTS ────────────────────────────────────────────────────
 
 HERO_HTML = """
-<script>
-window.toggleResonovaTheme = function() {
-    var h = document.documentElement;
-    var b = document.body;
-    var current = h.getAttribute('data-theme') || 'light';
-    var next = (current === 'dark') ? 'light' : 'dark';
-    
-    h.setAttribute('data-theme', next);
-    b.setAttribute('data-theme', next);
-    
-    if (next === 'light') {
-        h.classList.remove('dark');
-        b.classList.remove('dark');
-    } else {
-        h.classList.add('dark');
-        b.classList.add('dark');
-    }
-
-    var cs = document.querySelectorAll('.gradio-container');
-    cs.forEach(function(c) {
-        c.setAttribute('data-theme', next);
-        if (next === 'light') {
-            c.classList.remove('dark');
-        } else {
-            c.classList.add('dark');
-        }
-    });
-
-    try { localStorage.setItem('resonova-theme', next); } catch(e){}
-    
-    var iconSun = document.getElementById('theme-icon-sun');
-    var iconMoon = document.getElementById('theme-icon-moon');
-    var themeText = document.getElementById('theme-text');
-    if (next === 'dark') {
-        if (iconSun) iconSun.style.display = 'inline-block';
-        if (iconMoon) iconMoon.style.display = 'none';
-        if (themeText) themeText.textContent = 'Light Mode';
-    } else {
-        if (iconSun) iconSun.style.display = 'none';
-        if (iconMoon) iconMoon.style.display = 'inline-block';
-        if (themeText) themeText.textContent = 'Dark Mode';
-    }
-};
-
-(function() {
-    var saved = localStorage.getItem('resonova-theme') || 'light';
-    var h = document.documentElement;
-    var b = document.body;
-    h.setAttribute('data-theme', saved);
-    b.setAttribute('data-theme', saved);
-    if (saved === 'light') {
-        h.classList.remove('dark');
-        b.classList.remove('dark');
-    } else {
-        h.classList.add('dark');
-        b.classList.add('dark');
-    }
-})();
-</script>
-
 <div class="header-wrapper">
     <div class="brand-container">
         <svg class="brand-logo-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -633,15 +573,10 @@ window.toggleResonovaTheme = function() {
             </defs>
         </svg>
         <div class="brand-text">
-            <div class="brand-title" style="font-family: 'Dancing Script', 'Great Vibes', 'Caveat', cursive !important; font-size: 3.2rem !important; font-weight: 700 !important; color: #C85A32 !important; margin: 0 !important; line-height: 1.1 !important; display: block !important; visibility: visible !important; opacity: 1 !important;">Resonova</div>
-            <p style="margin: 2px 0 0 0; font-size: 0.88rem; color: var(--text-secondary); font-weight: 500;">Speak once. Understood everywhere</p>
+            <div class="brand-title" style="font-family: 'Dancing Script', 'Great Vibes', 'Caveat', cursive !important; font-size: 3.5rem !important; font-weight: 700 !important; color: #F4A261 !important; margin: 0 !important; line-height: 1.1 !important; display: block !important; visibility: visible !important; opacity: 1 !important; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">Resonova</div>
+            <p style="margin: 2px 0 0 0; font-size: 0.88rem; color: #D6CCC2; font-weight: 500;">Speak once. Understood everywhere</p>
         </div>
     </div>
-    <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" aria-label="Toggle Dark/Light Theme" onclick="window.toggleResonovaTheme && window.toggleResonovaTheme()">
-        <span id="theme-icon-sun" style="display:none;">☀️</span>
-        <span id="theme-icon-moon">🌙</span>
-        <span id="theme-text">Dark Mode</span>
-    </button>
 </div>
 
 <div class="metrics-bar">
@@ -663,7 +598,6 @@ window.toggleResonovaTheme = function() {
     </div>
 </div>
 """
-
 
 def get_compute_banner():
     if IS_GPU:
