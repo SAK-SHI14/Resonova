@@ -567,14 +567,14 @@ HERO_HTML = """
             <path d="M50 26V38" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
             <defs>
                 <linearGradient id="logo-grad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-                    <stop stop-color="#F97316"/>
-                    <stop offset="1" stop-color="#FB923C"/>
+                    <stop stop-color="#E07A5F"/>
+                    <stop offset="1" stop-color="#F4A261"/>
                 </linearGradient>
             </defs>
         </svg>
         <div class="brand-text">
-            <h1>Resonova</h1>
-            <p>AI-Powered Video Dubbing · English → Hindi</p>
+            <div class="brand-title" style="font-family: 'Dancing Script', 'Great Vibes', 'Caveat', cursive !important; font-size: 3.2rem !important; font-weight: 700 !important; color: #C85A32 !important; margin: 0 !important; line-height: 1.1 !important; display: block !important; visibility: visible !important; opacity: 1 !important;">Resonova</div>
+            <p style="margin: 2px 0 0 0; font-size: 0.88rem; color: var(--text-secondary); font-weight: 500;">AI-Powered Video Dubbing · English → Hindi</p>
         </div>
     </div>
     <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" aria-label="Toggle Dark/Light Theme">
@@ -604,49 +604,57 @@ HERO_HTML = """
 </div>
 
 <script>
-window.toggleResonovaTheme = function() {
-    var current = document.documentElement.getAttribute('data-theme') || 
-        (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    var next = (current === 'dark') ? 'light' : 'dark';
-    
-    document.documentElement.setAttribute('data-theme', next);
-    document.body.setAttribute('data-theme', next);
-    var containers = document.querySelectorAll('.gradio-container');
-    containers.forEach(function(c) { c.setAttribute('data-theme', next); });
-    try { localStorage.setItem('resonova-theme', next); } catch(e){}
-    
-    var iconSun = document.getElementById('theme-icon-sun');
-    var iconMoon = document.getElementById('theme-icon-moon');
-    var themeText = document.getElementById('theme-text');
-    if (next === 'dark') {
-        if (iconSun) iconSun.style.display = 'inline-block';
-        if (iconMoon) iconMoon.style.display = 'none';
-        if (themeText) themeText.textContent = 'Light Mode';
-    } else {
-        if (iconSun) iconSun.style.display = 'none';
-        if (iconMoon) iconMoon.style.display = 'inline-block';
-        if (themeText) themeText.textContent = 'Dark Mode';
+(function() {
+    function doToggle() {
+        var h = document.documentElement;
+        var b = document.body;
+        var curr = h.getAttribute('data-theme') || b.getAttribute('data-theme') || 'light';
+        var next = (curr === 'dark') ? 'light' : 'dark';
+        
+        h.setAttribute('data-theme', next);
+        b.setAttribute('data-theme', next);
+        document.querySelectorAll('.gradio-container').forEach(function(c) {
+            c.setAttribute('data-theme', next);
+        });
+        try { localStorage.setItem('resonova-theme', next); } catch(e){}
+        
+        var iconSun = document.getElementById('theme-icon-sun');
+        var iconMoon = document.getElementById('theme-icon-moon');
+        var themeText = document.getElementById('theme-text');
+        if (next === 'dark') {
+            if (iconSun) iconSun.style.display = 'inline-block';
+            if (iconMoon) iconMoon.style.display = 'none';
+            if (themeText) themeText.textContent = 'Light Mode';
+        } else {
+            if (iconSun) iconSun.style.display = 'none';
+            if (iconMoon) iconMoon.style.display = 'inline-block';
+            if (themeText) themeText.textContent = 'Dark Mode';
+        }
     }
-};
 
-if (!window.__resonova_theme_bound) {
-    window.__resonova_theme_bound = true;
+    window.toggleResonovaTheme = doToggle;
+
     document.addEventListener('click', function(e) {
-        var btn = e.target && e.target.closest ? e.target.closest('#theme-toggle-btn') : null;
+        var btn = e.target ? (e.target.id === 'theme-toggle-btn' ? e.target : (e.target.closest ? e.target.closest('#theme-toggle-btn') : null)) : null;
         if (btn) {
             e.preventDefault();
             e.stopPropagation();
-            window.toggleResonovaTheme();
+            doToggle();
         }
     }, true);
-}
 
-(function() {
-    const saved = localStorage.getItem('resonova-theme') || 
+    var saved = localStorage.getItem('resonova-theme') || 
         (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    applyTheme(saved);
     
-    [50, 150, 300, 600, 1000].forEach(delay => setTimeout(() => applyTheme(saved), delay));
+    document.documentElement.setAttribute('data-theme', saved);
+    document.body.setAttribute('data-theme', saved);
+    
+    [50, 200, 500, 1000].forEach(function(delay) {
+        setTimeout(function() {
+            var cs = document.querySelectorAll('.gradio-container');
+            cs.forEach(function(c) { c.setAttribute('data-theme', saved); });
+        }, delay);
+    });
 })();
 </script>
 """
