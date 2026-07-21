@@ -1,15 +1,3 @@
----
-title: Resonova — Emotion-Preserving AI Video Dubbing
-emoji: 🗣️
-colorFrom: orange
-colorTo: red
-sdk: gradio
-sdk_version: "4.44.0"
-app_file: resonova/app/spaces_app.py
-pinned: true
-license: mit
-short_description: English → Hindi AI dubbing in your own voice, emotion preserved
----
 
 <div align="center">
 
