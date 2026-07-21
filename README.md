@@ -10,14 +10,9 @@ pinned: true
 license: mit
 ---
 
-# Resonova 🗣️ — वाणी
+# Resonova 🗣️
 
 **English → Hindi video dubbing in your own voice, with emotion preserved.**
-
-[![Live Demo](https://img.shields.io/badge/🤗-Live%20Demo-blue)](https://6f508b9880e5b95075.gradio.live)
-[![Tests](https://img.shields.io/badge/tests-83--passing-brightgreen)]()
-[![ADRs](https://img.shields.io/badge/ADRs-6%20documented-blue)]()
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
@@ -53,58 +48,11 @@ supports **Microsoft Edge Neural TTS** fallback for natural-sounding voices, and
 
 ## How to Run
 
-### 🌐 Option 1: Live Verification Link (No Setup)
+### 🌐 Try Resonova Live (No Setup)
 
 **[Try Resonova live on Gradio Share →](https://6f508b9880e5b95075.gradio.live)**
 
 *Note: This link is hosted directly from local execution via Gradio tunneling. Check the Demo Mode option for instant UI verification.*
-
----
-
-### 🌐 Option 2: HuggingFace Spaces (Production)
-
-**[Production HuggingFace Space →](https://huggingface.co/spaces/SAK-SHI14/resonova-dubbing)**
-
-ZeroGPU mode: ~2–4 min per 45-second clip (GPU) or ~20 min (CPU fallback).
-The UI tells you which mode is active before you submit.
-
----
-
-### 🐳 Option 2: Docker (recommended for local GPU)
-
-```bash
-git clone https://github.com/SAK-SHI14/resonova
-cd resonova
-
-# Download Wav2Lip GAN checkpoint (~400 MB):
-mkdir wav2lip_checkpoints
-# Place wav2lip_gan.pth here (see notes.md for download link)
-
-docker compose up --build
-# Open http://localhost:7860
-```
-
-**Requires:** Docker, Docker Compose, NVIDIA GPU + `nvidia-container-toolkit`
-
-For CPU-only machines, the UI loads but inference takes ~20 minutes per clip.
-
----
-
-### 🧪 Option 3: Google Colab (development / no local GPU)
-
-Open [`notebooks/resonova_colab_template.ipynb`](notebooks/resonova_colab_template.ipynb)
-in Google Colab with a **T4 GPU runtime**.
-The notebook restores the full environment from scratch in ~5 minutes.
-
----
-
-### 🔬 Option 4: Unit Tests (no GPU required)
-
-```bash
-pip install -e ".[dev]"
-pytest -m "not integration" -v --tb=short
-# Expected: 75+ tests passing, 0 failures
-```
 
 ---
 
@@ -121,9 +69,11 @@ Extracted Audio (16 kHz WAV)
         ▼                  ▼
   [Whisper medium]    Prosody Features
   English Transcript  F0 · RMS · Rate
+  ...
         │                  │
         ▼ [IndicTrans2-1B] │
   Hindi Translation        │
+  ...
         │                  ▼
         └──────→ [XTTS-v2, speaker_wav=orig]
                  Raw Cloned Hindi Audio
@@ -220,23 +170,6 @@ resonova/                  ← Root
 Your videos are never stored, never shared, and never leave the session.
 See [docs/PRIVACY.md](docs/PRIVACY.md) for the full privacy design document,
 including the responsible use statement on voice cloning.
-
----
-
-## Deploy to HuggingFace Spaces
-
-```bash
-# Add the HuggingFace remote (replace with your Space URL)
-git remote add spaces https://huggingface.co/spaces/YOUR_USERNAME/resonova-dubbing
-
-# Push — HF Spaces auto-detects app_file from README.md YAML header
-git push spaces main
-
-# The Space will:
-#   1. Install packages.txt (ffmpeg, libsndfile1)
-#   2. pip install -r hf_requirements.txt
-#   3. Launch resonova/app/spaces_app.py
-```
 
 ---
 
