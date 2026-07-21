@@ -558,6 +558,66 @@ def _load_css() -> str:
 # ── HTML COMPONENTS ────────────────────────────────────────────────────
 
 HERO_HTML = """
+<script>
+window.toggleResonovaTheme = function() {
+    var h = document.documentElement;
+    var b = document.body;
+    var current = h.getAttribute('data-theme') || 'light';
+    var next = (current === 'dark') ? 'light' : 'dark';
+    
+    h.setAttribute('data-theme', next);
+    b.setAttribute('data-theme', next);
+    
+    if (next === 'light') {
+        h.classList.remove('dark');
+        b.classList.remove('dark');
+    } else {
+        h.classList.add('dark');
+        b.classList.add('dark');
+    }
+
+    var cs = document.querySelectorAll('.gradio-container');
+    cs.forEach(function(c) {
+        c.setAttribute('data-theme', next);
+        if (next === 'light') {
+            c.classList.remove('dark');
+        } else {
+            c.classList.add('dark');
+        }
+    });
+
+    try { localStorage.setItem('resonova-theme', next); } catch(e){}
+    
+    var iconSun = document.getElementById('theme-icon-sun');
+    var iconMoon = document.getElementById('theme-icon-moon');
+    var themeText = document.getElementById('theme-text');
+    if (next === 'dark') {
+        if (iconSun) iconSun.style.display = 'inline-block';
+        if (iconMoon) iconMoon.style.display = 'none';
+        if (themeText) themeText.textContent = 'Light Mode';
+    } else {
+        if (iconSun) iconSun.style.display = 'none';
+        if (iconMoon) iconMoon.style.display = 'inline-block';
+        if (themeText) themeText.textContent = 'Dark Mode';
+    }
+};
+
+(function() {
+    var saved = localStorage.getItem('resonova-theme') || 'light';
+    var h = document.documentElement;
+    var b = document.body;
+    h.setAttribute('data-theme', saved);
+    b.setAttribute('data-theme', saved);
+    if (saved === 'light') {
+        h.classList.remove('dark');
+        b.classList.remove('dark');
+    } else {
+        h.classList.add('dark');
+        b.classList.add('dark');
+    }
+})();
+</script>
+
 <div class="header-wrapper">
     <div class="brand-container">
         <svg class="brand-logo-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -577,7 +637,7 @@ HERO_HTML = """
             <p style="margin: 2px 0 0 0; font-size: 0.88rem; color: var(--text-secondary); font-weight: 500;">Speak once. Understood everywhere</p>
         </div>
     </div>
-    <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" aria-label="Toggle Dark/Light Theme">
+    <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" aria-label="Toggle Dark/Light Theme" onclick="window.toggleResonovaTheme && window.toggleResonovaTheme()">
         <span id="theme-icon-sun" style="display:none;">☀️</span>
         <span id="theme-icon-moon">🌙</span>
         <span id="theme-text">Dark Mode</span>
@@ -602,76 +662,6 @@ HERO_HTML = """
         <div class="metric-label">Ablation SER</div>
     </div>
 </div>
-
-<script>
-(function() {
-    function applyTheme(next) {
-        var h = document.documentElement;
-        var b = document.body;
-        
-        h.setAttribute('data-theme', next);
-        b.setAttribute('data-theme', next);
-        
-        if (next === 'light') {
-            h.classList.remove('dark');
-            b.classList.remove('dark');
-        } else {
-            h.classList.add('dark');
-            b.classList.add('dark');
-        }
-
-        var cs = document.querySelectorAll('.gradio-container');
-        cs.forEach(function(c) {
-            c.setAttribute('data-theme', next);
-            if (next === 'light') {
-                c.classList.remove('dark');
-            } else {
-                c.classList.add('dark');
-            }
-        });
-
-        try { localStorage.setItem('resonova-theme', next); } catch(e){}
-        
-        var iconSun = document.getElementById('theme-icon-sun');
-        var iconMoon = document.getElementById('theme-icon-moon');
-        var themeText = document.getElementById('theme-text');
-        if (next === 'dark') {
-            if (iconSun) iconSun.style.display = 'inline-block';
-            if (iconMoon) iconMoon.style.display = 'none';
-            if (themeText) themeText.textContent = 'Light Mode';
-        } else {
-            if (iconSun) iconSun.style.display = 'none';
-            if (iconMoon) iconMoon.style.display = 'inline-block';
-            if (themeText) themeText.textContent = 'Dark Mode';
-        }
-    }
-
-    function doToggle() {
-        var h = document.documentElement;
-        var curr = h.getAttribute('data-theme') || 'light';
-        var next = (curr === 'dark') ? 'light' : 'dark';
-        applyTheme(next);
-    }
-
-    window.toggleResonovaTheme = doToggle;
-
-    document.addEventListener('click', function(e) {
-        var btn = e.target ? (e.target.id === 'theme-toggle-btn' ? e.target : (e.target.closest ? e.target.closest('#theme-toggle-btn') : null)) : null;
-        if (btn) {
-            e.preventDefault();
-            e.stopPropagation();
-            doToggle();
-        }
-    }, true);
-
-    var saved = localStorage.getItem('resonova-theme') || 'light';
-    applyTheme(saved);
-    
-    [50, 200, 500, 1000].forEach(function(delay) {
-        setTimeout(function() { applyTheme(saved); }, delay);
-    });
-})();
-</script>
 """
 
 

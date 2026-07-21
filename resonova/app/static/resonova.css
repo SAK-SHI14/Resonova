@@ -1,16 +1,18 @@
 /* ═══════════════════════════════════════════════════
-   RESONOVA — AESTHETIC BEIGE & PASTEL DESIGN SYSTEM v7
-   Design: Light Beige (Default) & Dark Espresso (On Toggle)
+   RESONOVA — AESTHETIC BEIGE & PASTEL DESIGN SYSTEM v8
+   Design: Bulletproof Dual Theme (Light Beige vs Dark Espresso)
    ═══════════════════════════════════════════════════ */
 
 @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Great+Vibes&family=Caveat:wght@700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
-/* ── LIGHT THEME (DEFAULT / EXPLICIT) ── */
+/* ── 1. LIGHT THEME (DEFAULT) ── */
 :root,
 html,
 body,
 .gradio-container,
 html[data-theme="light"],
+html[data-theme="light"] body,
+html[data-theme="light"] .gradio-container,
 body[data-theme="light"],
 .gradio-container[data-theme="light"] {
   --bg-app: #FDFBF7 !important;
@@ -56,9 +58,12 @@ body[data-theme="light"],
   --button-primary-text-color: #FFFFFF !important;
 }
 
-/* ── DARK THEME (ONLY WHEN EXPLICITLY TOGGLED) ── */
+/* ── 2. DARK THEME (ONLY WHEN EXPLICITLY SET TO DARK) ── */
 html[data-theme="dark"],
+html[data-theme="dark"] body,
+html[data-theme="dark"] .gradio-container,
 body[data-theme="dark"],
+body[data-theme="dark"] .gradio-container,
 .gradio-container[data-theme="dark"] {
   --bg-app: #1C1917 !important;
   --bg-card: #262322 !important;
