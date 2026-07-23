@@ -31,7 +31,7 @@ Lovely Professional University | B.Tech Computer Science & Engineering (AI & Dat
 
 **B.Tech in Computer Science and Engineering (Specialization in AI & Data Engineering)**  
 *Lovely Professional University, Phagwara, Punjab* | **2023 – 2027**  
-- **CGPA**: 8.8 / 10.0
+- **CGPA**: 7.4 / 10.0
 - **Relevant Coursework**: Machine Learning, Deep Learning Architectures, Natural Language Processing, Computer Vision, Data Structures & Algorithms, Operating Systems, Database Management Systems.
 
 ---
