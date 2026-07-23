@@ -33,6 +33,7 @@ build/
 .eggs/
 .pytest_cache/
 .mypy_cache/
+.gradio/
 *.so
 
 # ─── Virtual environments ───
